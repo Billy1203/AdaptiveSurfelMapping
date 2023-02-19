@@ -5,7 +5,7 @@
 
 #include "Config.h"
 
-Config::Config(float fx, float fy, float cx, float cy, int rows, int cols, float r)
+Config::Config(float fx, float fy, float cx, float cy, int rows, int cols, float diff, float r)
 : fx_(fx),
   fy_(fy),
   cx_(cx),
@@ -13,7 +13,7 @@ Config::Config(float fx, float fy, float cx, float cy, int rows, int cols, float
   rows_(rows),
   cols_(cols),
   num_pixels(rows * cols),
-
+  diff0(diff),
   r0(r)
 {
     //============ Shader =====================//
@@ -31,18 +31,20 @@ Config::Config(float fx, float fy, float cx, float cy, int rows, int cols, float
      * float radius
      *--------------------
      * Which is three vec4s
+     *
+     * config里面的常数可以传入到shader，如何引入build_map中的自变量，r和diff_thresh到config然后导入到shader？
      */
     vertex_size = sizeof(Eigen::Vector4f) * 3;
     near_clip = 1.0f;                                         // the min depth processed
     far_clip = 50.0f;                                         // the max depth processed
-    surfel_fuse_distance_threshold_factor = 0.0f;             // modify threshold of two sufels
+    //diff = 0.12f;             // modify threshold of two sufels
 
     max_sqrt_vertices = 5000;
-    depth_padding = 10.0f;                                    // depth padding width
+    depth_padding = 0.0f;                                    // depth padding width
 
     //r0 = 1.0;
 
-    //r = 1.5;
+    //r = 10.0f;
 
     // Parameters in building map
     //diff_thresh
@@ -56,8 +58,8 @@ Config::Config(float fx, float fy, float cx, float cy, int rows, int cols, float
 
 }
 
-Config & Config::getInstance(float fx, float fy, float cx, float cy, int rows, int cols, float r)
+Config & Config::getInstance(float fx, float fy, float cx, float cy, int rows, int cols, float diff, float r)
 {
-    static Config instance(fx, fy, cx, cy, rows, cols, r);
+    static Config instance(fx, fy, cx, cy, rows, cols, diff, r);
     return instance;
 }

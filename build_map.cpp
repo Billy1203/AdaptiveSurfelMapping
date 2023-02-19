@@ -233,20 +233,19 @@ void rungui(SurfelMapping & core, GUI & gui)
             if(pangolin::Pushed(*gui.save))
             {
                 //std::string output_path = "../output/";
-                // todo
 
-                time_t rawtime;
-                struct tm *info;
-
-                time(&rawtime);
-                info = gmtime(&rawtime);
-
-                std::string file_name = "surfel_map_" + to_string(info->tm_year + 1900) + "_"
-                                                      + to_string(info->tm_mon + 1) + "_"
-                                                      + to_string(info->tm_mday) + "_"
-                                                      + to_string(info->tm_hour)
-                                                      + to_string(info->tm_min)
-                                                      + to_string(info->tm_sec) + ".bin";
+                //time_t rawtime;
+                //struct tm *info;
+                //
+                //time(&rawtime);
+                //info = gmtime(&rawtime);
+                //
+                //std::string file_name = "surfel_map_" + to_string(info->tm_year + 1900) + "_"
+                //                                      + to_string(info->tm_mon + 1) + "_"
+                //                                      + to_string(info->tm_mday) + "_"
+                //                                      + to_string(info->tm_hour)
+                //                                      + to_string(info->tm_min)
+                //                                      + to_string(info->tm_sec) + ".bin";
 
                 //output_path += file_name;
                 std::string output_path = "./tmp.bin";
@@ -278,8 +277,16 @@ int main(int argc, char ** argv)
 
     KittiReader reader(kittiDir, false, false, 0, true);
 
+    std::string model_path(argv[2]);
+
+    std::string diff_tmp(argv[3]);
+    float diff = std::stod(diff_tmp);
+
+    std::string r_tmp(argv[4]);
+    float r = std::stod(r_tmp);
+
     // Initialize the Config in first call with correct arguments
-    Config::getInstance(reader.fx(), reader.fy(), reader.cx(), reader.cy(), reader.H(), reader.W());
+    Config::getInstance(reader.fx(), reader.fy(), reader.cx(), reader.cy(), reader.H(), reader.W(), diff, r);
 
     GUI gui(reader.W(), reader.H(), GUI::ShowMode::supervision);
 

@@ -112,6 +112,9 @@ private:
     float nearClipDepth;
     float farClipDepth;
 
+    float depthPad;
+    float surfelFuseDistanceThreshFactor;
+
     std::vector<Eigen::Matrix4f> historyPoses;
 
     bool beginCleanPoints;
@@ -125,6 +128,8 @@ private:
     void filterDepth();
     void metriciseDepth();
     void removeMovings();
+
+
 };
 
 #endif //SURFELMAPPING_SURFELMAPPING_H

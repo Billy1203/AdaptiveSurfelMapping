@@ -379,8 +379,13 @@ int main(int argc, char ** argv)
     std::string model_path(argv[2]);
 
     // Initialize the Config in first call with correct arguments
-    float r = 0.5f;
-    Config::getInstance(reader.fx(), reader.fy(), reader.cx(), reader.cy(), reader.H(), reader.W(), r);
+    std::string diff_tmp(argv[3]);
+    float diff = std::stod(diff_tmp);
+
+    std::string r_tmp(argv[4]);
+    float r = std::stod(r_tmp);
+
+    Config::getInstance(reader.fx(), reader.fy(), reader.cx(), reader.cy(), reader.H(), reader.W(), diff, r);
 
     GUI gui(reader.W(), reader.H(), GUI::ShowMode::minimum);
 

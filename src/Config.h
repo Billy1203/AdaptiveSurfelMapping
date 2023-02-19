@@ -15,7 +15,7 @@
 class Config
 {
 public:
-    static Config & getInstance(float fx = 0, float fy = 0, float cx = 0, float cy = 0, int rows = 0, int cols = 0, float r=1.0);
+    static Config & getInstance(float fx = 0, float fy = 0, float cx = 0, float cy = 0, int rows = 0, int cols = 0, float diff=0.5, float r=1.0);
 
     static float &fx() { return getInstance().fx_; }
     static float &fy() { return getInstance().fy_; }
@@ -27,9 +27,9 @@ public:
     static int &vertexSize() { return getInstance().vertex_size; }
     static float &nearClip() { return getInstance().near_clip; }
     static float &farClip() { return getInstance().far_clip; }
-    static float &surfelFuseDistanceThreshFactor() { return getInstance().surfel_fuse_distance_threshold_factor; }
+    static float &depthPad() { return getInstance().depth_padding; } // depth padding for stereo images
 
-    static float &depthPad() { return getInstance().depth_padding; }
+    static float &surfelFuseDistanceThreshFactor() { return getInstance().diff0; }
     static float &rzero() { return getInstance().r0; }
 
     static int &maxSqrtVertices() { return getInstance().max_sqrt_vertices; }
@@ -54,16 +54,17 @@ private:
     int vertex_size;
     float near_clip;
     float far_clip;
-    float surfel_fuse_distance_threshold_factor;
+
 
     int max_sqrt_vertices;
     float depth_padding;
 
 
     float r0;
+    float diff0;
 
     // --------------
-    Config(float fx, float fy, float cx, float cy, int rows, int cols, float r);
+    Config(float fx, float fy, float cx, float cy, int rows, int cols, float diff, float r);
 
 };
 

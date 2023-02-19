@@ -18,6 +18,8 @@ SurfelMapping::SurfelMapping()
   beginCleanPoints(false),
   nearClipDepth(Config::nearClip()),
   farClipDepth(Config::farClip()),
+  depthPad(Config::depthPad()),
+  surfelFuseDistanceThreshFactor(Config::surfelFuseDistanceThreshFactor()),
   checker(new Checker)
 {
     createTextures();
@@ -244,7 +246,9 @@ void SurfelMapping::metriciseDepth()
     uniforms.emplace_back("minD", nearClipDepth);
     uniforms.emplace_back("maxD", farClipDepth);
     uniforms.emplace_back("cols", (float)Config::W());
-    uniforms.emplace_back("stereoBorder", 80.f);
+    uniforms.emplace_back("stereoBorder", depthPad);
+    uniforms.emplace_back("r0", (float)Config::rzero());
+    //std::cout << depthPad << std::endl;
 
     computePacks[ComputePack::METRIC]->compute(textures[GPUTexture::DEPTH_METRIC]->texture,
                                                textures[GPUTexture::DEPTH_RAW]->texture,
@@ -265,8 +269,9 @@ void SurfelMapping::filterDepth()
     uniforms.emplace_back("cols", (float)Config::W() );
     uniforms.emplace_back("rows", (float)Config::H() );
     uniforms.emplace_back("minD", nearClipDepth);
-    uniforms.emplace_back("maxD", 100.f );
-    uniforms.emplace_back("diffThresh", 0.15f);  // threshold of support pixel
+    uniforms.emplace_back("maxD", farClipDepth);
+    uniforms.emplace_back("diffThresh", surfelFuseDistanceThreshFactor);  // threshold of support pixel
+    uniforms.emplace_back("r0", (float)Config::rzero());
 
     computePacks[ComputePack::FILTER]->compute(textures[GPUTexture::DEPTH_FILTERED]->texture,
                                                inputs,
@@ -289,9 +294,10 @@ void SurfelMapping::filterDepth()
     uniforms.emplace_back("cols", (float)Config::W() );
     uniforms.emplace_back("rows", (float)Config::H() );
     uniforms.emplace_back("minD", nearClipDepth);
-    uniforms.emplace_back("maxD", 100.f );
-    uniforms.emplace_back("stereoBorder", 80.f);
+    uniforms.emplace_back("maxD", farClipDepth);
+    uniforms.emplace_back("stereoBorder", depthPad);
     uniforms.emplace_back("sigPix", sigma_intensity2_inv_half);
+    uniforms.emplace_back("r0", (float)Config::rzero());
 
     computePacks[ComputePack::SMOOTH]->compute(textures[GPUTexture::DEPTH_METRIC]->texture,
                                                inputs,
@@ -309,8 +315,9 @@ void SurfelMapping::filterDepth()
     uniforms.emplace_back("cols", (float)Config::W() );
     uniforms.emplace_back("rows", (float)Config::H() );
     uniforms.emplace_back("minD", nearClipDepth);
-    uniforms.emplace_back("maxD", 100.f );
-    uniforms.emplace_back("diffThresh", 0.1f);  // threshold of support pixel  todo tune
+    uniforms.emplace_back("maxD", farClipDepth);
+    uniforms.emplace_back("diffThresh", surfelFuseDistanceThreshFactor);  // threshold of support pixel  todo tune
+    uniforms.emplace_back("r0", (float)Config::rzero());
 
     computePacks[ComputePack::FILTER]->compute(textures[GPUTexture::DEPTH_FILTERED]->texture,
                                                inputs,
@@ -338,10 +345,11 @@ void SurfelMapping::removeMovings()
     uniforms.emplace_back("rows", (float)Config::H() );
     uniforms.emplace_back("cam", cam);
     uniforms.emplace_back("minD", nearClipDepth);
-    uniforms.emplace_back("maxD", 100.f );
+    uniforms.emplace_back("maxD", farClipDepth);
     uniforms.emplace_back("t_c2l", T_c2l);
-    uniforms.emplace_back("stereoBorder", 80.f);
+    uniforms.emplace_back("stereoBorder", depthPad);
     uniforms.emplace_back("moveThresh", 0.5f);
+    uniforms.emplace_back("r0", (float)Config::rzero());
 
     computePacks["MOVINGS"]->compute(textures[GPUTexture::DEPTH_METRIC]->texture,
                                      inputs,
@@ -498,7 +506,7 @@ void SurfelMapping::cleanPoints(const unsigned short *depth, const unsigned char
                                 textures[GPUTexture::SEMANTIC],
                                 nearClipDepth,
                                 farClipDepth - 15,
-                                0.1f,
+                                surfelFuseDistanceThreshFactor,
                                 1);
 
     //std::cout << "Conflict Num: " << globalModel.getConflict().second << '\n';
