@@ -69,19 +69,22 @@ target_link_libraries(surmap_gui
         ${Pangolin_LIBRARIES}
 )
 
+# build in c++
 add_executable(build_map build_map.cpp)
-
 target_link_libraries(build_map surmap_gui surfelmapping)
 
 add_executable(load_map load_map.cpp)
-
 target_link_libraries(load_map surmap_gui surfelmapping)
 
+# build in pybing11
 
-if (BUILD_TEST)
-    add_executable(test test_main.cpp)
 
-    target_link_libraries(test surmap_gui surfelmapping)
-endif ()
+
+
+#if (BUILD_TEST)
+#    add_executable(test test_main.cpp)
+#
+#    target_link_libraries(test surmap_gui surfelmapping)
+#endif ()
 
 
