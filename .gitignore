@@ -33,11 +33,11 @@
 
 # Dictionary
 *.bin
-maps/
-output/
-Pangolin/
-pybind11/
-SPADE/
-cmake-build-debug/
+maps/*
+output/*
+Pangolin/*
+pybind11/*
+SPADE/*
+cmake-build-debug/*
 
 .DS_Store
