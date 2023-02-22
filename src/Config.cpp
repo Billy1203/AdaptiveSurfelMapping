@@ -13,8 +13,8 @@ Config::Config(float fx, float fy, float cx, float cy, int rows, int cols, float
   rows_(rows),
   cols_(cols),
   num_pixels(rows * cols),
-  diff0(diff),
-  r0(r)
+  r0(r),
+  diff0(diff)
 {
     //============ Shader =====================//
     /* Single surfel model:
