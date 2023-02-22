@@ -13,18 +13,18 @@ from util import util
 
 
 def move_dataset(param1, param2):
-    '''
+    """
         move data from 'aaa' to specific dataset
 
         - paired
             -0.1_0.5.png
             -0.1_0.8.png
-        '''
+    """
     image_dataset = "./load_map_output/"
     select_index = "0000000080.png"
 
     lpips_model = models.PerceptualLoss(use_gpu=False)
-    print(">" * 16, "param1=%.2f param2=%.2f" % (param1, param2), "<" * 16)
+    print(">" * 17, "param1=%.1f param2=%.1f" % (param1, param2), "<" * 17)
 
     for _sub_dic_name in ["paired", "novel_left", "novel_right"]:
 
@@ -36,6 +36,7 @@ def move_dataset(param1, param2):
 
         new_image_name = str(param1) + "_" + str(param2) + ".png"
 
+        ###################### Image movement ######################
         original_image_path = image_dataset + _sub_dic_name + "/" + select_index
         new_image_path = "./" + _sub_dic_name + "/" + new_image_name
         shutil.copy(original_image_path, new_image_path)
@@ -49,15 +50,11 @@ def move_dataset(param1, param2):
         psnr = compare_psnr(gt_img, original_img)
         ssim = compare_ssim(gt_img, original_img, channel_axis=2, data_range=255)
 
-
         gt_tensor = util.im2tensor(gt_img)
         original_tensor = util.im2tensor(original_img)
         lpips = torch.square(lpips_model.forward(gt_tensor, original_tensor))
 
-
         print("[%11s]\tpsnr=%.5f ssim=%.5f lpips=%.5f" % (_sub_dic_name, psnr, ssim, lpips))
-
-
 
 
 if __name__ == '__main__':
