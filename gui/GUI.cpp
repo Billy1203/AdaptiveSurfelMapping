@@ -10,13 +10,13 @@ GUI::GUI(int rawWidth, int rawHeight, ShowMode mode)
   renderedViewNum(0)
 {
     // whole GUI window size
-    //width = 1280;
-    //height = 980;
-    //panel = 205;
+    width = 1280;
+    height = 980;
+    panel = 205;
 
-    width = 400;
-    height = 300;
-    panel = 100;
+    //width = 400;
+    //height = 300;
+    //panel = 100;
 
     setRawSize(rawWidth, rawHeight);
 
