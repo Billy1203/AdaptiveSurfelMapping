@@ -34,19 +34,15 @@
 # Dictionary
 *.bin
 *.csv
-maps/*
 output/*
-Pangolin/*
-pybind11/*
+Pangolin/cmake-build-debug
+Pangolin/build
 SPADE/*
 cmake-build-debug/*
 
-rl_evaluation/20230214
-rl_evaluation/aaa
 rl_evaluation/load_map_output
 rl_evaluation/novel_left
 rl_evaluation/novel_right
 rl_evaluation/paired
-rl_evaluation/evaluation_results
 
 .DS_Store
