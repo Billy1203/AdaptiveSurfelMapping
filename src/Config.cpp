@@ -40,7 +40,7 @@ Config::Config(float fx, float fy, float cx, float cy, int rows, int cols, float
     //diff = 0.12f;             // modify threshold of two sufels
 
     max_sqrt_vertices = 5000;
-    depth_padding = 0.0f;                                    // depth padding width
+    depth_padding = 80.0f;                                    // depth padding width
 
     //r0 = 1.0;
 

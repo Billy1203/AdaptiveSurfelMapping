@@ -102,7 +102,7 @@ bool KittiReader::getCore(const std::string &depth_file, const std::string &rgb_
     cv::Mat rgb_mat = cv::imread(rgb_file, cv::IMREAD_COLOR);
     if(rgb_mat.data == nullptr)
     {
-        printf("CANNOT read RGB image from %s", rgb_file.c_str());
+        //printf("CANNOT read RGB image from %s\n", rgb_file.c_str());
         return false;
     }
 
@@ -144,7 +144,7 @@ bool KittiReader::getCore(const std::string &depth_file, const std::string &rgb_
         cv::Mat dep_mat = cv::imread(depth_file, cv::IMREAD_ANYDEPTH);
         if(dep_mat.data == nullptr)
         {
-            printf("CANNOT read depth image from %s", depth_file.c_str());
+            //printf("CANNOT read depth image from %s\n", depth_file.c_str());
             return false;
         }
 
@@ -179,7 +179,7 @@ bool KittiReader::getCore(const std::string &depth_file, const std::string &rgb_
         cv::Mat sem_mat = cv::imread(semantic_file, cv::IMREAD_ANYDEPTH);
         if(sem_mat.data == nullptr)
         {
-            printf("CANNOT read semantic image from %s", semantic_file.c_str());
+            //printf("CANNOT read semantic image from %s\n", semantic_file.c_str());
             return false;
         }
 

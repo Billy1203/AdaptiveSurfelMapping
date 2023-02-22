@@ -1,4 +1,4 @@
-# Yiheng_SurfelMapping
+# AdaptiveSurfelMapping
 Real time traffic scene mapping using dense surfel representation.
 
 This repo is part of the code of our LADS: Lightweight Autonomous Driving Simulator Using Surfel Mapping and GAN Enhancement. The SurfelMapping rebuilds the 3D traffic scene from images collected by stereo camera of a driving vihecle. The 3D model is represented by surfels to make the rendered images more realistic.
@@ -8,14 +8,17 @@ The code is inspired by https://www.imperial.ac.uk/dyson-robotics-lab/downloads/
 ![image](https://github.com/Zhiozhio/SurfelMapping/blob/master/loadmap.gif)
 
 ## 1. Dependencies
-1. Ubuntu 18.04. We only tested on 18.04 but should be compatible to other adjacent distributions.
+1. We tested on Ubuntu 20.04 & Ubuntu 18.04.
 2. CMake
 3. OpenGL
 4. Eigen
-5. [pangolin](https://github.com/stevenlovegrove/Pangolin). Build from source.
+5. [Pangolin](https://github.com/stevenlovegrove/Pangolin). Build from source.
 6. not too small GPU memory
+7. pybind11 (optional, for called in python)
+8. SPADE (optional, for post-process)
 
 ## 2. Build
+### Build in C++
 run commands
 ```
 mkdir build
@@ -23,6 +26,9 @@ cd build
 cmake ..
 make
 ```
+
+
+### Build in Python
 
 ## 3. Usage
 The program requires RGB images and corresponding DEPTH and SEMANTIC maps as input. We use some third part learning methods prediction to provide dense depth map and semantic labels. You can download demo data from [here](https://drive.google.com/file/d/1uKM7Gbs_Hy99OwrfqNmNIAZQuydQ_Gdw/view?usp=sharing) (using [PSMNet](https://github.com/JiaRenChang/PSMNet) for depth and [PointRend](https://github.com/facebookresearch/detectron2/tree/main/projects/PointRend) for semantic). You can use your own data including RGB, depth and semantic. The RGB, depth and semantic subdirectories should be in a same super directory and set the subdir name in the KittiReader. See [KittiReader.cpp](https://github.com/Zhiozhio/SurfelMapping/blob/master/gui/KittiReader.cpp) for details of input path. If you use the demo data, you do not need to change it.

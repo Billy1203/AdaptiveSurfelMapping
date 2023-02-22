@@ -28,11 +28,10 @@ public:
     static float &nearClip() { return getInstance().near_clip; }
     static float &farClip() { return getInstance().far_clip; }
     static float &depthPad() { return getInstance().depth_padding; } // depth padding for stereo images
+    static int &maxSqrtVertices() { return getInstance().max_sqrt_vertices; }
 
     static float &surfelFuseDistanceThreshFactor() { return getInstance().diff0; }
     static float &rzero() { return getInstance().r0; }
-
-    static int &maxSqrtVertices() { return getInstance().max_sqrt_vertices; }
 
     static std::string shaderDir()
     {
@@ -49,13 +48,9 @@ private:
     int rows_, cols_;                                /// image dimensions
     int num_pixels;
 
-
-
     int vertex_size;
     float near_clip;
     float far_clip;
-
-
     int max_sqrt_vertices;
     float depth_padding;
 

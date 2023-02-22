@@ -10,9 +10,13 @@ GUI::GUI(int rawWidth, int rawHeight, ShowMode mode)
   renderedViewNum(0)
 {
     // whole GUI window size
-    width = 1280;
-    height = 980;
-    panel = 205;
+    //width = 1280;
+    //height = 980;
+    //panel = 205;
+
+    width = 400;
+    height = 300;
+    panel = 100;
 
     setRawSize(rawWidth, rawHeight);
 
@@ -53,7 +57,7 @@ GUI::GUI(int rawWidth, int rawHeight, ShowMode mode)
 
 
 
-
+    // For build_map
     if(mode == ShowMode::supervision)
     {
         pangolin::Display("rgb").SetAspect(rawWidth / rawHeight).SetLock(pangolin::LockLeft, pangolin::LockBottom);
@@ -91,19 +95,18 @@ GUI::GUI(int rawWidth, int rawHeight, ShowMode mode)
         showSemanticProgram = loadProgramFromFile("empty.vert", "quad.geom", "show_semantic.frag");
 
         // set panel
-        pause = new pangolin::Var<bool>("ui.Pause", true, true);
+        pause = new pangolin::Var<bool>("ui.Pause", false, true);
         step = new pangolin::Var<bool>("ui.Step", false, false);
 
         //    depthCutoff = new pangolin::Var<float>("ui.Depth cutoff", 3.0, 0.0, 12.0);
         //
         followPose = new pangolin::Var<bool>("ui.Follow pose", true, true);
-        drawRawCloud = new pangolin::Var<int>("ui.Draw raw", 0, 0, 5);
+        drawRawCloud = new pangolin::Var<int>("ui.Draw raw", 2, 0, 5);
         //drawFilteredCloud = new pangolin::Var<int>("ui.Draw filtered", 0, 0, 4);
-        drawGlobalModel = new pangolin::Var<int>("ui.Draw global model", 2, 0, 5);
+        drawGlobalModel = new pangolin::Var<int>("ui.Draw global model", 4, 0, 5);
         clean = new pangolin::Var<bool>("ui.Clean Pointcloud", false, false);
         save = new pangolin::Var<bool>("ui.Save", false, false);
         reset = new pangolin::Var<bool>("ui.Reset", false, false);
-
         pathMode = new pangolin::Var<bool>("ui.Path Mode", false, true);
         acquirePairedImage = new pangolin::Var<bool>("ui.Acquire Paired Images", false, false);
 
@@ -117,6 +120,8 @@ GUI::GUI(int rawWidth, int rawHeight, ShowMode mode)
     }
 
 
+    // For load_map
+    //
     if(mode == ShowMode::minimum)
     {
         pangolin::CreatePanel("ui").SetBounds(0.0, 1.0, 0.0, pangolin::Attach::Pix(panel));
@@ -127,12 +132,12 @@ GUI::GUI(int rawWidth, int rawHeight, ShowMode mode)
         drawGlobalModel = new pangolin::Var<int>("ui.Draw global model", 2, 0, 5);
         clean = new pangolin::Var<bool>("ui.Clean Pointcloud", false, false);
 
-        pathMode = new pangolin::Var<bool>("ui.Path Mode", false, true);
-        acquirePairedImage = new pangolin::Var<bool>("ui.Acquire Paired Images", false, false);
-        novelViewNum = new pangolin::Var<int>("ui.Novel Views Num", 0, 0, 5);
-        generateNovelViews = new pangolin::Var<bool>("ui.Generate Novel Views", false, false);
+        pathMode = new pangolin::Var<bool>("ui.Path Mode", true, false);
+        acquirePairedImage = new pangolin::Var<bool>("ui.Acquire Paired Images", true, false);
+        novelViewNum = new pangolin::Var<int>("ui.Novel Views Num", 4, 0, 5);
+        generateNovelViews = new pangolin::Var<bool>("ui.Generate Novel Views", true, false);
         generate_S_views = new pangolin::Var<bool>("ui.generate \"S\"-shaped path", false, false);
-        acquireNovelImage = new pangolin::Var<bool>("ui.Acquire Novel Images", false, false);
+        acquireNovelImage = new pangolin::Var<bool>("ui.Acquire Novel Images", true, false);
         overview = new pangolin::Var<bool>("ui.Overview", false, true);
     }
 

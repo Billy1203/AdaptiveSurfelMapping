@@ -1,6 +1,6 @@
 //
 // Created by zhijun on 2021/7/27.
-// Edited by Yiheng on 20220611
+// Edited by Yiheng on 2023/2/20.
 //
 
 #include "KittiReader.h"
@@ -23,7 +23,7 @@ int globalId = 0;
 int lastRestartId = 0;
 
 
-void rungui(SurfelMapping & core, GUI & gui)
+void rungui(SurfelMapping & core, GUI & gui, string model_path)
 {
     //============ Here is GUI ============//
     if(gui.getMode() == GUI::ShowMode::minimum)
@@ -150,7 +150,7 @@ void rungui(SurfelMapping & core, GUI & gui)
                 //=== If acquire images
                 if(pangolin::Pushed(*gui.acquirePairedImage))
                 {
-                    std::string data_path = "../output/";
+                    std::string data_path = "../build_map_output/";
                     // todo
 
                     std::vector<Eigen::Matrix4f> views;
@@ -248,9 +248,9 @@ void rungui(SurfelMapping & core, GUI & gui)
                 //                                      + to_string(info->tm_sec) + ".bin";
 
                 //output_path += file_name;
-                std::string output_path = "./tmp.bin";
+                //std::string output_path = "./tmp.bin";
 
-                core.getGlobalModel().downloadMap(output_path, lastRestartId, globalId);
+                core.getGlobalModel().downloadMap(model_path, lastRestartId, globalId);
             }
 
             //====== Reset
@@ -271,20 +271,19 @@ void rungui(SurfelMapping & core, GUI & gui)
 
 
 
-int main(int argc, char ** argv)
+//int main(int argc, char ** argv)
+int building_map(string kittiDir, string model_path, float diff, float r)
 {
-    std::string kittiDir(argv[1]);
+    //##################### Parameters #####################
+    //std::string kittiDir(argv[1]);
+    //std::string model_path(argv[2]);
+    //std::string diff_tmp(argv[3]);
+    //float diff = std::stod(diff_tmp);
+    //std::string r_tmp(argv[4]);
+    //float r = std::stod(r_tmp);
+    //######################################################
 
     KittiReader reader(kittiDir, false, false, 0, true);
-
-    std::string model_path(argv[2]);
-
-    std::string diff_tmp(argv[3]);
-    float diff = std::stod(diff_tmp);
-
-    std::string r_tmp(argv[4]);
-    float r = std::stod(r_tmp);
-
     // Initialize the Config in first call with correct arguments
     Config::getInstance(reader.fx(), reader.fy(), reader.cx(), reader.cy(), reader.H(), reader.W(), diff, r);
 
@@ -301,14 +300,14 @@ int main(int argc, char ** argv)
     while (reader.getNext())
     {
         //============ Process Current Frame ============//
-        cout << reader.currentFrameId << '\n';
+        //cout << reader.currentFrameId << '\n';
 
         globalId = reader.currentFrameId;
 
         core.processFrame(reader.rgb, reader.depth, reader.semantic, &reader.gtPose);
 
         // show what you want
-        rungui(core, gui);
+        rungui(core, gui, model_path);
 
         if(core.getBeginCleanPoints())
         {
@@ -321,26 +320,35 @@ int main(int argc, char ** argv)
 
                 core.cleanPoints(reader.depth, reader.semantic, &reader.gtPose);  // here we unset the "beginCleanPoints"
 
-                rungui(core, gui);
+                rungui(core, gui, model_path);
 
                 if(!core.getBeginCleanPoints())
                     break;
 
-                usleep(10000);
+                //usleep(10000);
             }
 
             reader.resumeState();
         }
 
-        usleep(10000);
+        //usleep(10000);
 
     }
+    core.getGlobalModel().downloadMap(model_path, lastRestartId, globalId);
 
     // show after loop
-    while(true)
-    {
-        rungui(core, gui);
-    }
+    //while(true)
+    //{
+    //    rungui(core, gui, model_path);
+    //}`
 
 
+}
+
+#include <pybind11/pybind11.h>
+namespace  py=pybind11;
+
+PYBIND11_MODULE(build_map, m){
+    m.doc()="Adaptive surfel mapping step1-build map";
+    m.def("building_map", &building_map, "Building GSM and save .bin file in the local dictionary.");
 }

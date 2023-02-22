@@ -22,7 +22,9 @@ int globalId = 0;
 int lastRestartId = 0;
 
 std::vector<Eigen::Matrix4f> modelPoses;
-std::vector<Eigen::Matrix4f> novelViews;
+std::vector<Eigen::Matrix4f> novelViewS;
+std::vector<Eigen::Matrix4f> novelViewLeft;
+std::vector<Eigen::Matrix4f> novelViewRight;
 
 bool S_shaped_novel = false;
 
@@ -96,11 +98,17 @@ void rungui(SurfelMapping & core, GUI & gui)
 
                 //=== draw all novel frame (if exist)
                 float frameColor[3] = {1.f, 0.f, 0.0f};
-                for(auto & p : novelViews)
+                for(auto & p : novelViewLeft)
                 {
                     gui.drawFrustum(p, frameColor);
                     positionVertNovel.emplace_back(p.topRightCorner<3, 1>());
                 }
+                for(auto & p : novelViewRight)
+                {
+                    gui.drawFrustum(p, frameColor);
+                    positionVertNovel.emplace_back(p.topRightCorner<3, 1>());
+                }
+
                 if(S_shaped_novel)
                 {
 
@@ -113,7 +121,7 @@ void rungui(SurfelMapping & core, GUI & gui)
                 //=== If acquire images
                 if(pangolin::Pushed(*gui.acquirePairedImage))
                 {
-                    std::string data_path = "../output/paired";  // todo
+                    std::string data_path = "./load_map_output/paired";  // todo
 
                     std::vector<Eigen::Matrix4f> views;
                     gui.getViews(views, modelPoses);  // todo
@@ -175,12 +183,12 @@ void rungui(SurfelMapping & core, GUI & gui)
                 */ // generate random novel views
 
                 {
-                    novelViews.clear();
+                    novelViewLeft.clear();
 
                     std::vector<Eigen::Matrix4f> views;
                     gui.getViews(views, modelPoses);  // todo
 
-
+                    // novel left view
                     for(int i = 0; i < views.size(); ++i)
                     {
                         auto v = views[i];
@@ -197,8 +205,11 @@ void rungui(SurfelMapping & core, GUI & gui)
 
                         v = v * T.matrix();
 
-                        novelViews.push_back(v);
+                        novelViewLeft.push_back(v);
                     }
+
+                    novelViewRight.clear();
+                    // novel right view
                     for(int i = 0; i < views.size(); ++i)
                     {
                         auto v = views[i];
@@ -215,7 +226,7 @@ void rungui(SurfelMapping & core, GUI & gui)
 
                         v = v * T.matrix();
 
-                        novelViews.push_back(v);
+                        novelViewRight.push_back(v);
                     }
 
                     S_shaped_novel = false;
@@ -225,14 +236,14 @@ void rungui(SurfelMapping & core, GUI & gui)
                 //=== generate "S"-shaped novel views
                 if(pangolin::Pushed(*gui.generate_S_views))
                 {
-                    novelViews.clear();
+                    novelViewS.clear();
 
                     // get novel view sinusoidal period
                     int novelViewNum = gui.novelViewNum->Get() * 3;
 
                     std::vector<Eigen::Matrix4f> views;
                     gui.getViews(views, modelPoses);  // todo
-                    novelViews.reserve(views.size());
+                    novelViewS.reserve(views.size());
 
                     auto curr_v = views[0];
                     auto last_v = curr_v;
@@ -256,7 +267,7 @@ void rungui(SurfelMapping & core, GUI & gui)
 
                         Eigen::Transform<float, 3, Eigen::Affine> T;
                         T = translation * rotation;
-                        novelViews.emplace_back(curr_v * T.matrix());
+                        novelViewS.emplace_back(curr_v * T.matrix());
 
                         last_v = curr_v;
                     }
@@ -267,12 +278,12 @@ void rungui(SurfelMapping & core, GUI & gui)
                 //=== If acquire novel images
                 if(pangolin::Pushed(*gui.acquireNovelImage))
                 {
-                    std::string data_path = "../output/novel";  // todo
+                    std::string data_path = "./load_map_output/novel_S";  // todo
 
                     if(S_shaped_novel)
                     {
                         // remove the start 4 frames
-                        std::vector<Eigen::Matrix4f> render_views(novelViews.begin() + 4, novelViews.end());
+                        std::vector<Eigen::Matrix4f> render_views(novelViewS.begin() + 4, novelViewS.end());
 
                         core.acquireImages(data_path, render_views,
                                            Config::W(), Config::H(),
@@ -283,14 +294,28 @@ void rungui(SurfelMapping & core, GUI & gui)
                     }
                     else
                     {
-                        core.acquireImages(data_path, novelViews,
+
+                        // save novel left image
+                        std::string data_left_path = "./load_map_output/novel_left";  // todo
+                        core.acquireImages(data_left_path, novelViewLeft,
                                            Config::W(), Config::H(),
                                            Config::fx(), Config::fy(),
                                            Config::cx(), Config::cy(),
-                                           totalNovelViewNum);
-                        printf("|==== Novel images from frame %d to %d are saved. ====|\n", totalNovelViewNum, totalNovelViewNum + novelViews.size() - 1);
+                                           0); // totalNovelViewNum
+                        printf("|==== Novel left images from frame %d to %d are saved. ====|\n", 0, novelViewLeft.size() - 1);
+                        //totalNovelViewNum += novelViews.size();
 
-                        totalNovelViewNum += novelViews.size();
+
+                        // save novel right image
+                        std::string data_right_path = "./load_map_output/novel_right";  // todo
+                        core.acquireImages(data_right_path, novelViewRight,
+                                           Config::W(), Config::H(),
+                                           Config::fx(), Config::fy(),
+                                           Config::cx(), Config::cy(),
+                                           0);
+                        printf("|==== Novel right images from frame %d to %d are saved. ====|\n", 0,  + novelViewRight.size() - 1);
+                        break;
+
                     }
 
                     usleep(10000);
@@ -370,20 +395,19 @@ void rungui(SurfelMapping & core, GUI & gui)
 
 
 
-int main(int argc, char ** argv)
+//int main(int argc, char ** argv)
+int loading_map(string kittiDir, string model_path, float diff, float r)
 {
-    std::string kittiDir(argv[1]);
+    //##################### Parameters #####################
+    //std::string kittiDir(argv[1]);
+    //std::string model_path(argv[2]);
+    //std::string diff_tmp(argv[3]);
+    //float diff = std::stod(diff_tmp);
+    //std::string r_tmp(argv[4]);
+    //float r = std::stod(r_tmp);
+    //######################################################
 
     KittiReader reader(kittiDir, false, false, 0, true);
-
-    std::string model_path(argv[2]);
-
-    // Initialize the Config in first call with correct arguments
-    std::string diff_tmp(argv[3]);
-    float diff = std::stod(diff_tmp);
-
-    std::string r_tmp(argv[4]);
-    float r = std::stod(r_tmp);
 
     Config::getInstance(reader.fx(), reader.fy(), reader.cx(), reader.cy(), reader.H(), reader.W(), diff, r);
 
@@ -413,10 +437,33 @@ int main(int argc, char ** argv)
         modelPoses.push_back(reader.gtPose);
     }
 
+    //  generate view
+
+
+
+
+    // save image
+
+
+    //rungui(core, gui);
     // show after loop
     while (true)
     {
         rungui(core, gui);
+        if(!core.getBeginCleanPoints())
+            break;
     }
 
 }
+
+#include <pybind11/pybind11.h>
+namespace  py=pybind11;
+
+PYBIND11_MODULE(load_map, m){
+    m.doc()="Adaptive surfel mapping step1-build map";
+    m.def("loading_map", &loading_map, "Building GSM and save .bin file in the local dictionary.");
+}
+
+
+
+///home/yiheng/dataset/carla/map1_scene1_output ../maps/tmp22.bin 2.5 2.5
