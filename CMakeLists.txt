@@ -8,25 +8,14 @@ endif(POLICY CMP0048)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/Pangolin/build/src")
 
 set(SHADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/Shaders" CACHE PATH "Where the shaders live")
-#set(GUI_SHADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/gui/Shaders" CACHE PATH "Where the GUI shaders live")
-
-#set(CMAKE_CXX_FLAGS ${ADDITIONAL_CMAKE_CXX_FLAGS} "-O3 -msse2 -msse3 -Wall -std=c++11 -DSHADER_DIR=${efusion_SHADER_DIR}")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -O0 -std=c++11 -DSHADER_DIR=${SHADER_DIR} -DGUI_SHADER_DIR=${GUI_SHADER_DIR}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -O0 -std=c++11 -DSHADER_DIR=${SHADER_DIR}")
 set(CMAKE_BUILD_TYPE Debug)
 
-
-set(BUILD_TEST 0)
-
-message("!!! CMAKE_MODULE_PATH: " ${CMAKE_MODULE_PATH})
-
 find_package(Pangolin 0.1 REQUIRED PATHS ${CMAKE_MODULE_PATH})
-#find_package(CUDA REQUIRED)
-#find_package(SuiteSparse REQUIRED)
 find_package(OpenCV REQUIRED)
 
+message("!!! CMAKE_MODULE_PATH: " ${CMAKE_MODULE_PATH})
 message("!!!Pangolin location: " ${Pangolin_INCLUDE_DIRS} ${Pangolin_CMAKEMODULES})
-
 
 # code for lib
 include_directories(
@@ -34,12 +23,11 @@ include_directories(
         ${Pangolin_INCLUDE_DIRS}
         ${EIGEN_INCLUDE_DIRS}
         src
-        src/Utils)
-        
+        src/Utils
+)
 
 file(GLOB srcs src/*.cpp)
 file(GLOB utils_srcs src/Utils/*.cpp)
-
 
 # code for gui
 include_directories(
@@ -51,51 +39,52 @@ include_directories(
 
 file(GLOB gui_srcs gui/*.cpp)
 
-
 add_library(surfelmapping SHARED
         ${srcs}
         ${utils_srcs}
-)
+        )
 
 target_link_libraries(surfelmapping
         ${Eigen_LIBRARIES}
         ${Pangolin_LIBRARIES}
-)
+        )
 
 add_library(surmap_gui SHARED
         ${gui_srcs}
-)
+        )
 
 target_link_libraries(surmap_gui
         ${OpenCV_LIBS}
         ${Eigen_LIBRARIES}
         ${Pangolin_LIBRARIES}
-)
+        )
 
 ###################### build in c++ ######################
 #add_executable(build_map build_map.cpp)
-#target_link_libraries(build_map surmap_gui surfelmapping)
+#target_link_libraries(build_map
+#        surmap_gui
+#        surfelmapping
+#        )
 #
 #add_executable(load_map load_map.cpp)
-#target_link_libraries(load_map surmap_gui surfelmapping)
+#target_link_libraries(load_map
+#        surmap_gui
+#        surfelmapping
+#        )
 ##########################################################
 
 ###################### build in pybing11 ######################
 add_subdirectory(pybind11)
 
 pybind11_add_module(build_map build_map.cpp)
-target_link_libraries(build_map surmap_gui surfelmapping)
+target_link_libraries(build_map
+        surmap_gui
+        surfelmapping
+        )
 
 pybind11_add_module(load_map load_map.cpp)
-target_link_libraries(load_map surmap_gui surfelmapping)
+target_link_libraries(load_map
+        surmap_gui
+        surfelmapping
+        )
 ##############################################################
-
-
-
-#if (BUILD_TEST)
-#    add_executable(test test_main.cpp)
-#
-#    target_link_libraries(test surmap_gui surfelmapping)
-#endif ()
-
-
