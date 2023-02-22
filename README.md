@@ -74,3 +74,7 @@ The program requires RGB images and corresponding DEPTH and SEMANTIC maps as inp
 
 1. Modify the depth directory path in `KittiReader.cpp`
 2. evaluation directly
+
+
+# SPADE
+The work in _SPADE_ dir is forked from https://github.com/NVlabs/SPADE. We modified the input and some other parts. a _postprocess.py_ is also added for synthesizing final images from the GAN generated image and rendered image. Please go to original [SPADE](https://github.com/NVlabs/SPADE) to see the training and testing of the code.
