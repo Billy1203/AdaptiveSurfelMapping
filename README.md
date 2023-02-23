@@ -4,8 +4,6 @@ Real time traffic scene mapping using dense surfel representation.
 
 This repo is part of the code of Adaptive Large-Scale Novel View Image Synthesis for Autonomous Driving Datasets. The SurfelMapping rebuilds the 3D traffic scene from images collected by stereo camera of a driving vihecle. The 3D model is represented by surfels to make the rendered images more realistic.
 
-The project is inspired by [ElasticFusion](https://www.imperial.ac.uk/dyson-robotics-lab/downloads/elastic-fusion/).
-
 # 1. Dependencies
 
 1. Tested on Ubuntu 20.04 & Ubuntu 18.04
@@ -78,3 +76,7 @@ The program requires RGB images and corresponding DEPTH and SEMANTIC maps as inp
 
 # SPADE
 The work in _SPADE_ dir is forked from https://github.com/NVlabs/SPADE. We modified the input and some other parts. a _postprocess.py_ is also added for synthesizing final images from the GAN generated image and rendered image. Please go to original [SPADE](https://github.com/NVlabs/SPADE) to see the training and testing of the code.
+
+
+# Acknowledgements
+Our code is inspired by [ElasticFusion](https://www.imperial.ac.uk/dyson-robotics-lab/downloads/elastic-fusion/).
