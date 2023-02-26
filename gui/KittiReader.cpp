@@ -12,8 +12,8 @@
 #include <iomanip>
 
 int file_name_width = 10;
-std::string depth_dir = "/psmnet";
-//std::string depth_dir = "/depth_2";
+//std::string depth_dir = "/psmnet_output";
+std::string depth_dir = "/depth_2";
 //std::string depth_dir = "/wavelets-monodepth";
 
 KittiReader::KittiReader(std::string datasetDir, bool estimateDepth, bool useSemantic, int subLevel, bool groundTruth)
