@@ -270,7 +270,7 @@ void SurfelMapping::filterDepth()
     uniforms.emplace_back("rows", (float)Config::H() );
     uniforms.emplace_back("minD", nearClipDepth);
     uniforms.emplace_back("maxD", farClipDepth);
-    uniforms.emplace_back("diffThresh", surfelFuseDistanceThreshFactor);  // threshold of support pixel
+    uniforms.emplace_back("diffThresh", (float)Config::depthDiffThresh());  // threshold of support pixel
     uniforms.emplace_back("r0", (float)Config::rzero());
 
     computePacks[ComputePack::FILTER]->compute(textures[GPUTexture::DEPTH_FILTERED]->texture,
@@ -316,7 +316,7 @@ void SurfelMapping::filterDepth()
     uniforms.emplace_back("rows", (float)Config::H() );
     uniforms.emplace_back("minD", nearClipDepth);
     uniforms.emplace_back("maxD", farClipDepth);
-    uniforms.emplace_back("diffThresh", surfelFuseDistanceThreshFactor);  // threshold of support pixel  todo tune
+    uniforms.emplace_back("diffThresh", (float)Config::depthDiffThresh());  // threshold of support pixel  todo tune
     uniforms.emplace_back("r0", (float)Config::rzero());
 
     computePacks[ComputePack::FILTER]->compute(textures[GPUTexture::DEPTH_FILTERED]->texture,

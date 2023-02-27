@@ -35,25 +35,22 @@ Config::Config(float fx, float fy, float cx, float cy, int rows, int cols, float
      * config里面的常数可以传入到shader，如何引入build_map中的自变量，r和diff_thresh到config然后导入到shader？
      */
     vertex_size = sizeof(Eigen::Vector4f) * 3;
-    near_clip = 2.0f;                                         // the min depth processed 1.0f
+    near_clip = 1.0f;                                         // the min depth processed 1.0f
     far_clip = 50.0f;                                         // the max depth processed 50.0f
-    //diff = 0.12f;             // modify threshold of two sufels
 
     max_sqrt_vertices = 5000;
     depth_padding = 80.0f;                                    // depth padding width 80.0f
+    depth_diff_thresh = 0.5f;   // threshold of 7-support pixels
 
     //r0 = 1.0;
-
     //r = 10.0f;
 
     // Parameters in building map
-    //diff_thresh
-    //h_0
-
+    //diff_thresh: argv[1] param1, two surfels fusion thresh
 
 
     // Parameters in loading map
-    // r_0
+    // r_0: argv[2] param2, surfel resize times
 
 
 }

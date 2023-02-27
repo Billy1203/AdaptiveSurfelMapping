@@ -25,9 +25,13 @@ public:
     static int &W() { return getInstance().cols_; }
     static int &numPixels() { return getInstance().num_pixels; }
     static int &vertexSize() { return getInstance().vertex_size; }
+
+    // Depth parameters
     static float &nearClip() { return getInstance().near_clip; }
     static float &farClip() { return getInstance().far_clip; }
     static float &depthPad() { return getInstance().depth_padding; } // depth padding for stereo images
+    static float &depthDiffThresh() { return getInstance().depth_diff_thresh; }
+
     static int &maxSqrtVertices() { return getInstance().max_sqrt_vertices; }
 
     static float &surfelFuseDistanceThreshFactor() { return getInstance().diff0; }
@@ -49,12 +53,16 @@ private:
     int num_pixels;
 
     int vertex_size;
+
+    // Depth related parameters
     float near_clip;
     float far_clip;
     int max_sqrt_vertices;
     float depth_padding;
+    float depth_diff_thresh;
 
 
+    // To be tuned in RSM
     float r0;
     float diff0;
 
