@@ -396,7 +396,7 @@ void rungui(SurfelMapping & core, GUI & gui)
 
 
 //int main(int argc, char ** argv)
-int loading_map(string kittiDir, string model_path, float diff, float r)
+int loading_map(string kittiDir, string model_path, float diff, float r, string depth_dir, int file_name_width)
 {
     //##################### Parameters #####################
     //std::string kittiDir(argv[1]);
@@ -405,9 +405,13 @@ int loading_map(string kittiDir, string model_path, float diff, float r)
     //float diff = std::stod(diff_tmp);
     //std::string r_tmp(argv[4]);
     //float r = std::stod(r_tmp);
+    //std::string depth_dir(argv[5]);
+    //
+    //std::string name_length(argv[6]);
+    //int file_name_width = std::stod(name_length);
     //######################################################
 
-    KittiReader reader(kittiDir, false, false, 0, true);
+    KittiReader reader(kittiDir, false, false, 0, true, depth_dir);
 
     Config::getInstance(reader.fx(), reader.fy(), reader.cx(), reader.cy(), reader.H(), reader.W(), diff, r);
 
@@ -429,7 +433,7 @@ int loading_map(string kittiDir, string model_path, float diff, float r)
     int frame_id = lastRestartId - 1;
     reader.setState(frame_id);
     modelPoses.clear();
-    while (reader.getNext())
+    while (reader.getNext(file_name_width))
     {
         if(reader.currentFrameId > globalId)
             break;
@@ -445,14 +449,14 @@ int loading_map(string kittiDir, string model_path, float diff, float r)
     // save image
 
 
-    //rungui(core, gui);
+    rungui(core, gui);
     // show after loop
-    while (true)
-    {
-        rungui(core, gui);
-        if(!core.getBeginCleanPoints())
-            break;
-    }
+    //while (true)
+    //{
+    //    rungui(core, gui);
+    //    if(!core.getBeginCleanPoints())
+    //        break;
+    //}
 
 }
 
@@ -464,6 +468,3 @@ PYBIND11_MODULE(load_map, m){
     m.def("loading_map", &loading_map, "Building GSM and save .bin file in the local dictionary.");
 }
 
-
-
-///home/yiheng/dataset/carla/map1_scene1_output ../maps/tmp22.bin 2.5 2.5

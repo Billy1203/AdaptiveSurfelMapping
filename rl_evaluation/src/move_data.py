@@ -21,14 +21,20 @@ def move_dataset(param1, param2):
             -0.1_0.8.png
     """
     image_dataset = "./load_map_output/"
-    select_index = "0000000080.png"
+    # select_index = "0000000080.png"
+    select_index = "0000000033.png"
 
     lpips_model = models.PerceptualLoss(use_gpu=False)
     print(">" * 17, "param1=%.1f param2=%.1f" % (param1, param2), "<" * 17)
 
-    for _sub_dic_name in ["paired", "novel_left", "novel_right"]:
+    # for _sub_dic_name in ["paired", "novel_left", "novel_right"]:
+    for _sub_dic_name in ["paired"]:
 
-        gt_image_path = "./gt/" + _sub_dic_name + ".png"
+        gt_image_path = "./gt4/" + _sub_dic_name + ".png"
+        # gt: carla scene1
+        # gt2: kitti01
+        # gt3: kitti02
+        # gt4: kitti06
 
         # if not exist
         if _sub_dic_name not in os.listdir("./"):
@@ -55,10 +61,11 @@ def move_dataset(param1, param2):
         lpips = torch.square(lpips_model.forward(gt_tensor, original_tensor))
 
         print("[%11s]\tpsnr=%.5f ssim=%.5f lpips=%.5f" % (_sub_dic_name, psnr, ssim, lpips))
+        # print("%.5f\t%.5f\t%.5f" % (psnr, ssim, lpips))
 
 
 if __name__ == '__main__':
-    param1 = float(int(sys.argv[1]) / 100)
-    param2 = float(int(sys.argv[2]) / 10)
+    param1 = float(sys.argv[1])
+    param2 = float(sys.argv[2])
 
     move_dataset(param1, param2)

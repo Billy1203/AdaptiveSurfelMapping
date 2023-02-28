@@ -18,13 +18,14 @@
 class KittiReader : public DatasetReader
 {
 public:
-    KittiReader(std::string datasetDir, bool estimateDepth, bool useSemantic, int subLevel, bool groundTruth);
+    KittiReader(std::string datasetDir, bool estimateDepth, bool useSemantic, int subLevel,
+                bool groundTruth, std::string depth_dir);
 
     ~KittiReader() override;
 
-    bool getNext() override;
+    bool getNext(int file_name_width) override;
 
-    bool getLast() override;
+    bool getLast(int file_name_width) override;
 
     bool loadCalibration() final;
 

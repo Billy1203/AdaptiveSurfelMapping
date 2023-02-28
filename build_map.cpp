@@ -271,19 +271,24 @@ void rungui(SurfelMapping & core, GUI & gui, string model_path)
 
 
 
-int main(int argc, char ** argv)
-//int building_map(string kittiDir, string model_path, float diff, float r)
+//int main(int argc, char ** argv)
+int building_map(string kittiDir, string model_path, float diff, float r, string depth_dir, int file_name_width)
 {
     //##################### Parameters #####################
-    std::string kittiDir(argv[1]);
-    std::string model_path(argv[2]);
-    std::string diff_tmp(argv[3]);
-    float diff = std::stod(diff_tmp);
-    std::string r_tmp(argv[4]);
-    float r = std::stod(r_tmp);
+    //std::string kittiDir(argv[1]);
+    //std::string model_path(argv[2]);
+    //std::string diff_tmp(argv[3]);
+    //float diff = std::stod(diff_tmp);
+    //std::string r_tmp(argv[4]);
+    //float r = std::stod(r_tmp);
+    //std::string depth_dir(argv[5]); // depth_2, psmnet
+    //
+    //std::string name_length(argv[6]);
+    //int file_name_width = std::stod(name_length);
+
     //######################################################
 
-    KittiReader reader(kittiDir, false, false, 0, true);
+    KittiReader reader(kittiDir, false, false, 0, true, depth_dir);
     // Initialize the Config in first call with correct arguments
     Config::getInstance(reader.fx(), reader.fy(), reader.cx(), reader.cy(), reader.H(), reader.W(), diff, r);
 
@@ -297,7 +302,7 @@ int main(int argc, char ** argv)
 //    lastRestartId = 337;
 //    reader.setState(lastRestartId);
 
-    while (reader.getNext())
+    while (reader.getNext(file_name_width))
     {
         //============ Process Current Frame ============//
         //cout << reader.currentFrameId << '\n';
@@ -314,7 +319,7 @@ int main(int argc, char ** argv)
             // clean points
             reader.saveState();
 
-            while (reader.getLast())
+            while (reader.getLast(file_name_width))
             {
                 cout << reader.currentFrameId << "<-" << '\n';
 
@@ -336,19 +341,27 @@ int main(int argc, char ** argv)
     }
     core.getGlobalModel().downloadMap(model_path, lastRestartId, globalId);
 
-    // show after loop
-    while(true)
-    {
-        rungui(core, gui, model_path);
-    }
+     //show after loop
+    //while(true)
+    //{
+    //    rungui(core, gui, model_path);
+    //}
 
 
 }
 
-//#include <pybind11/pybind11.h>
-//namespace  py=pybind11;
-//
-//PYBIND11_MODULE(build_map, m){
-//    m.doc()="Adaptive surfel mapping step1-build map";
-//    m.def("building_map", &building_map, "Building GSM and save .bin file in the local dictionary.");
-//}
+#include <pybind11/pybind11.h>
+namespace  py=pybind11;
+
+PYBIND11_MODULE(build_map, m){
+    m.doc()="Adaptive surfel mapping step1-build map";
+    m.def("building_map", &building_map, "Building GSM and save .bin file in the local dictionary.");
+}
+
+
+///home/yiheng/dataset/kitti-01-test/
+//../maps/tmp_kitti01.bin
+//0.1
+//2.5
+//psmnet
+//6

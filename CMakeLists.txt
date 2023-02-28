@@ -60,12 +60,12 @@ target_link_libraries(surmap_gui
         )
 
 ###################### build in c++ ######################
-add_executable(build_map build_map.cpp)
-target_link_libraries(build_map
-        surmap_gui
-        surfelmapping
-        )
-#
+#add_executable(build_map build_map.cpp)
+#target_link_libraries(build_map
+#        surmap_gui
+#        surfelmapping
+#        )
+##
 #add_executable(load_map load_map.cpp)
 #target_link_libraries(load_map
 #        surmap_gui
@@ -76,11 +76,11 @@ target_link_libraries(build_map
 ###################### build in pybing11 ######################
 add_subdirectory(pybind11)
 
-#pybind11_add_module(build_map build_map.cpp)
-#target_link_libraries(build_map
-#        surmap_gui
-#        surfelmapping
-#        )
+pybind11_add_module(build_map build_map.cpp)
+target_link_libraries(build_map
+        surmap_gui
+        surfelmapping
+        )
 
 pybind11_add_module(load_map load_map.cpp)
 target_link_libraries(load_map

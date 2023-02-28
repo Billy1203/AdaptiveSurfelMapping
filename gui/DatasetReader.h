@@ -21,13 +21,13 @@ public:
      * Get next frame write to depth & rgb. If not return false.
      * @return if successfully get next
      */
-    virtual bool getNext() = 0;
+    virtual bool getNext(int file_name_width) = 0;
 
     /**
      * Get last frame write to depth & rgb. If not return false.
      * @return if successfully get next
      */
-    virtual bool getLast() = 0;
+    virtual bool getLast(int file_name_width) = 0;
 
     /**
      * Load calibration file.

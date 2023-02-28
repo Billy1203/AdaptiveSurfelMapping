@@ -789,8 +789,8 @@ void GlobalModel::renderImage(const Eigen::Matrix4f &view)
     drawImageProgram->setUniform(Uniform("cam", imageCam));
     drawImageProgram->setUniform(Uniform("cols", (float)imageRenderBuffer.width));
     drawImageProgram->setUniform(Uniform("rows", (float)imageRenderBuffer.height));
-    //drawImageProgram->setUniform(Uniform("maxDepth", 200.f));
-    drawImageProgram->setUniform(Uniform("maxDepth", Config::farClip()));
+    drawImageProgram->setUniform(Uniform("maxDepth", 200.f)); // Generate images depth limitation
+    //drawImageProgram->setUniform(Uniform("maxDepth", Config::farClip()));
     drawImageProgram->setUniform(Uniform("threshold", Config::surfelFuseDistanceThreshFactor()));
 
     drawImageProgram->setUniform(Uniform("r0", Config::rzero()));

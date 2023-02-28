@@ -1,5 +1,5 @@
-python src/build_map.py /home/yiheng/dataset/carla/map1_scene1_output ./tmp_model.bin $1 $2
+#/home/yiheng/dataset/carla/carla_scene3_forest/
 
-python src/load_map.py /home/yiheng/dataset/carla/map1_scene1_output ./tmp_model.bin $1 $2
-
-python src/move_data.py $1 $2
+python src/build_map.py $1 ./tmp_carla01.bin $2 $3 $4 $5
+python src/load_map.py $1 ./tmp_carla01.bin $2 $3 $4 $5
+python src/move_data.py $2 $3

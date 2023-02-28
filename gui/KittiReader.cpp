@@ -11,12 +11,14 @@
 #include <opencv2/highgui.hpp>
 #include <iomanip>
 
-int file_name_width = 10;
-std::string depth_dir = "/psmnet";
+//int file_name_width = 10;
+//std::string depth_dir = "/psmnet";
 //std::string depth_dir = "/depth_2";
 //std::string depth_dir = "/wavelets-monodepth";
 
-KittiReader::KittiReader(std::string datasetDir, bool estimateDepth, bool useSemantic, int subLevel, bool groundTruth)
+
+KittiReader::KittiReader(std::string datasetDir, bool estimateDepth, bool useSemantic, int subLevel,
+                         bool groundTruth, std::string depth_dir)
         : DatasetReader(datasetDir, estimateDepth, useSemantic),
           sub_level(subLevel)
 {
@@ -58,7 +60,7 @@ KittiReader::~KittiReader()
     delete groundTruth;
 }
 
-bool KittiReader::getNext()
+bool KittiReader::getNext(int file_name_width)
 {
     ++currentFrameId;
 
@@ -77,7 +79,7 @@ bool KittiReader::getNext()
     return getCore(current_depth_file, current_rgb_file, current_semantic_file);
 }
 
-bool KittiReader::getLast()
+bool KittiReader::getLast(int file_name_width)
 {
     --currentFrameId;
 

@@ -54,6 +54,8 @@ private:
 
     int vertex_size;
 
+    int depth_dic_length;
+
     // Depth related parameters
     float near_clip;
     float far_clip;
