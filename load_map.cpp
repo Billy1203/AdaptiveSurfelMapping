@@ -395,20 +395,20 @@ void rungui(SurfelMapping & core, GUI & gui)
 
 
 
-//int main(int argc, char ** argv)
-int loading_map(string kittiDir, string model_path, float diff, float r, string depth_dir, int file_name_width)
+int main(int argc, char ** argv)
+//int loading_map(string kittiDir, string model_path, float diff, float r, string depth_dir, int file_name_width)
 {
     //##################### Parameters #####################
-    //std::string kittiDir(argv[1]);
-    //std::string model_path(argv[2]);
-    //std::string diff_tmp(argv[3]);
-    //float diff = std::stod(diff_tmp);
-    //std::string r_tmp(argv[4]);
-    //float r = std::stod(r_tmp);
-    //std::string depth_dir(argv[5]);
-    //
-    //std::string name_length(argv[6]);
-    //int file_name_width = std::stod(name_length);
+    std::string kittiDir(argv[1]);
+    std::string model_path(argv[2]);
+    std::string diff_tmp(argv[3]);
+    float diff = std::stod(diff_tmp);
+    std::string r_tmp(argv[4]);
+    float r = std::stod(r_tmp);
+    std::string depth_dir(argv[5]);
+
+    std::string name_length(argv[6]);
+    int file_name_width = std::stod(name_length);
     //######################################################
 
     KittiReader reader(kittiDir, false, false, 0, true, depth_dir);
@@ -451,20 +451,20 @@ int loading_map(string kittiDir, string model_path, float diff, float r, string 
 
     rungui(core, gui);
     // show after loop
-    //while (true)
-    //{
-    //    rungui(core, gui);
-    //    if(!core.getBeginCleanPoints())
-    //        break;
-    //}
+    while (true)
+    {
+        rungui(core, gui);
+        if(!core.getBeginCleanPoints())
+            break;
+    }
 
 }
 
-#include <pybind11/pybind11.h>
-namespace  py=pybind11;
-
-PYBIND11_MODULE(load_map, m){
-    m.doc()="Adaptive surfel mapping step1-build map";
-    m.def("loading_map", &loading_map, "Building GSM and save .bin file in the local dictionary.");
-}
+//#include <pybind11/pybind11.h>
+//namespace  py=pybind11;
+//
+//PYBIND11_MODULE(load_map, m){
+//    m.doc()="Adaptive surfel mapping step1-build map";
+//    m.def("loading_map", &loading_map, "Building GSM and save .bin file in the local dictionary.");
+//}
 

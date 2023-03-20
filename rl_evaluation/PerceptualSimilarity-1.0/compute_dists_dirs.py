@@ -13,7 +13,7 @@ parser.add_argument('--use_gpu', action='store_true', help='turn on flag to use 
 opt = parser.parse_args()
 
 ## Initializing the model
-model = models.PerceptualLoss(model='net-lin',net='alex',use_gpu=opt.use_gpu,version=opt.version)
+model = models.PerceptualLoss(model='net-lin', net='alex', use_gpu=opt.use_gpu, version=opt.version)
 
 # crawl directories
 f = open(opt.out,'w')
@@ -22,8 +22,8 @@ files = os.listdir(opt.dir0)
 for file in files:
 	if(os.path.exists(os.path.join(opt.dir1,file))):
 		# Load images
-		img0 = util.im2tensor(util.load_image(os.path.join(opt.dir0,file))) # RGB image from [-1,1]
-		img1 = util.im2tensor(util.load_image(os.path.join(opt.dir1,file)))
+		img0 = util.im2tensor(util.load_image(os.path.join(opt.dir0, file))) # RGB image from [-1,1]
+		img1 = util.im2tensor(util.load_image(os.path.join(opt.dir1, file)))
 
 		if(opt.use_gpu):
 			img0 = img0.cuda()

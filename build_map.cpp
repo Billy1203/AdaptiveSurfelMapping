@@ -271,21 +271,20 @@ void rungui(SurfelMapping & core, GUI & gui, string model_path)
 
 
 
-//int main(int argc, char ** argv)
-int building_map(string kittiDir, string model_path, float diff, float r, string depth_dir, int file_name_width)
+int main(int argc, char ** argv)
+//int building_map(string kittiDir, string model_path, float diff, float r, string depth_dir, int file_name_width)
 {
     //##################### Parameters #####################
-    //std::string kittiDir(argv[1]);
-    //std::string model_path(argv[2]);
-    //std::string diff_tmp(argv[3]);
-    //float diff = std::stod(diff_tmp);
-    //std::string r_tmp(argv[4]);
-    //float r = std::stod(r_tmp);
-    //std::string depth_dir(argv[5]); // depth_2, psmnet
-    //
-    //std::string name_length(argv[6]);
-    //int file_name_width = std::stod(name_length);
+    std::string kittiDir(argv[1]);
+    std::string model_path(argv[2]);
+    std::string diff_tmp(argv[3]);
+    float diff = std::stod(diff_tmp);
+    std::string r_tmp(argv[4]);
+    float r = std::stod(r_tmp);
+    std::string depth_dir(argv[5]); // depth_2, psmnet
 
+    std::string name_length(argv[6]);
+    int file_name_width = std::stod(name_length);
     //######################################################
 
     KittiReader reader(kittiDir, false, false, 0, true, depth_dir);
@@ -339,24 +338,24 @@ int building_map(string kittiDir, string model_path, float diff, float r, string
         usleep(10000);
 
     }
-    core.getGlobalModel().downloadMap(model_path, lastRestartId, globalId);
+    //core.getGlobalModel().downloadMap(model_path, lastRestartId, globalId);
 
      //show after loop
-    //while(true)
-    //{
-    //    rungui(core, gui, model_path);
-    //}
+    while(true)
+    {
+        rungui(core, gui, model_path);
+    }
 
 
 }
 
-#include <pybind11/pybind11.h>
-namespace  py=pybind11;
-
-PYBIND11_MODULE(build_map, m){
-    m.doc()="Adaptive surfel mapping step1-build map";
-    m.def("building_map", &building_map, "Building GSM and save .bin file in the local dictionary.");
-}
+//#include <pybind11/pybind11.h>
+//namespace  py=pybind11;
+//
+//PYBIND11_MODULE(build_map, m){
+//    m.doc()="Adaptive surfel mapping step1-build map";
+//    m.def("building_map", &building_map, "Building GSM and save .bin file in the local dictionary.");
+//}
 
 
 ///home/yiheng/dataset/kitti-01-test/

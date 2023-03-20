@@ -11,7 +11,7 @@ parser.add_argument('--use_gpu', action='store_true', help='turn on flag to use 
 opt = parser.parse_args()
 
 ## Initializing the model
-model = models.PerceptualLoss(model='net-lin',net='alex',use_gpu=opt.use_gpu,version=opt.version)
+model = models.PerceptualLoss(model='net-lin', net='alex', use_gpu=opt.use_gpu, version=opt.version)
 
 # Load images
 img0 = util.im2tensor(util.load_image(opt.path0)) # RGB image from [-1,1]

@@ -1,8 +1,6 @@
 import torch
 from util import util
 import models
-from models import dist_model as dm
-from IPython import embed
 
 use_gpu = False         # Whether to use GPU
 spatial = True         # Return a spatial map of perceptual distance.
@@ -28,9 +26,9 @@ if(use_gpu):
 dist = model.forward(dummy_im0,dummy_im1)
 
 ## Example usage with images
-ex_ref = util.im2tensor(util.load_image('./imgs/ex_ref.png'))
-ex_p0 = util.im2tensor(util.load_image('./imgs/ex_p0.png'))
-ex_p1 = util.im2tensor(util.load_image('./imgs/ex_p1.png'))
+ex_ref = util.im2tensor(util.load_image('imgs/ex_ref.png'))
+ex_p0 = util.im2tensor(util.load_image('imgs/ex_p0.png'))
+ex_p1 = util.im2tensor(util.load_image('imgs/ex_p1.png'))
 if(use_gpu):
 	ex_ref = ex_ref.cuda()
 	ex_p0 = ex_p0.cuda()
