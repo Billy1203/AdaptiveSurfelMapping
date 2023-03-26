@@ -132,12 +132,12 @@ GUI::GUI(int rawWidth, int rawHeight, ShowMode mode)
         drawGlobalModel = new pangolin::Var<int>("ui.Draw global model", 2, 0, 5);
         clean = new pangolin::Var<bool>("ui.Clean Pointcloud", false, false);
 
-        pathMode = new pangolin::Var<bool>("ui.Path Mode", true, false);
-        acquirePairedImage = new pangolin::Var<bool>("ui.Acquire Paired Images", true, false);
+        pathMode = new pangolin::Var<bool>("ui.Path Mode", false, false);
+        acquirePairedImage = new pangolin::Var<bool>("ui.Acquire Paired Images", false, false);
         novelViewNum = new pangolin::Var<int>("ui.Novel Views Num", 4, 0, 5);
         generateNovelViews = new pangolin::Var<bool>("ui.Generate Novel Views", true, false);
-        generate_S_views = new pangolin::Var<bool>("ui.generate \"S\"-shaped path", false, false);
-        acquireNovelImage = new pangolin::Var<bool>("ui.Acquire Novel Images", true, false);
+        generate_S_views = new pangolin::Var<bool>("ui.generate \"S\"-shaped path", false, true);
+        acquireNovelImage = new pangolin::Var<bool>("ui.Acquire Novel Images", false, false);
         overview = new pangolin::Var<bool>("ui.Overview", false, true);
     }
 
