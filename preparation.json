@@ -1,0 +1,22 @@
+{
+    "raw_data_dir": "./carla_vis_blank_raw",
+    "dest_dir": "./carla_vis_blank",
+    "sensors": [
+    	"camera",
+        "depth_2",
+        "depth_3",
+        "depth_val_0",
+        "depth_val_1",
+        "image_2",
+        "image_3",
+        "image_val_0",
+        "image_val_1",
+        "image_2_semantic",
+        "image_3_semantic",
+        "image_val_0_semantic",
+        "image_val_1_semantic"
+    ],
+    "frames": [
+        14, 280
+    ]
+}
