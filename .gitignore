@@ -40,9 +40,11 @@ Pangolin/build
 SPADE/*
 cmake-build-debug/*
 
-rl_evaluation/load_map_output/*
-rl_evaluation/novel_left/*
-rl_evaluation/novel_right/*
-rl_evaluation/paired/*
+**/novel_left
+**/novel_right
+**/paired
 
 .DS_Store
+**build**
+
+*.so

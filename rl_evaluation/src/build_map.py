@@ -1,4 +1,4 @@
-import build_map
+import build_map_py
 import sys
 
 
@@ -12,4 +12,6 @@ if __name__=='__main__':
     file_name_width = int(sys.argv[6])
     print("++++param1 is %.2f++++param2 is %.1f" % (param1, param2))
 
-    build_map.building_map(dataset_path, model_path, param1, param2, depth_dir, file_name_width)
+    build_map_py.building_map(dataset_path, model_path, param1, param2, depth_dir, file_name_width)
+
+# can run for around 120 frames

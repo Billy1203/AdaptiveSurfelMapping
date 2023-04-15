@@ -304,7 +304,7 @@ int main(int argc, char ** argv)
     while (reader.getNext(file_name_width))
     {
         //============ Process Current Frame ============//
-        //cout << reader.currentFrameId << '\n';
+        cout << "current frame id: " << reader.currentFrameId << '\n';
 
         globalId = reader.currentFrameId;
 

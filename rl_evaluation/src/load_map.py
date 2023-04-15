@@ -1,4 +1,4 @@
-import load_map
+import load_map_py
 import sys
 
 
@@ -11,4 +11,4 @@ if __name__=='__main__':
     file_name_width = int(sys.argv[6])
     print("++++param1 is %.2f++++param2 is %.1f" % (param1, param2))
 
-    load_map.loading_map(dataset_path, model_path, param1, param2, depth_dir, file_name_width)
+    load_map_py.loading_map(dataset_path, model_path, param1, param2, depth_dir, file_name_width)
