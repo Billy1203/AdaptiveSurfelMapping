@@ -9,7 +9,7 @@ from skimage.metrics import peak_signal_noise_ratio as compare_psnr
 from skimage.metrics import structural_similarity as compare_ssim
 
 # LPIPS environment
-sys.path.append("./PerceptualSimilarity-1.0/")
+sys.path.append("../PerceptualSimilarity-1.0/")
 import models
 from util import util
 

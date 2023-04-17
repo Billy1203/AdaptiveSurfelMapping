@@ -35,14 +35,14 @@ Config::Config(float fx, float fy, float cx, float cy, int rows, int cols, float
      * config里面的常数可以传入到shader，如何引入build_map中的自变量，r和diff_thresh到config然后导入到shader？
      */
 
-    //depth_dic_length = 6;
+    depth_dic_length = 10;
     vertex_size = sizeof(Eigen::Vector4f) * 3;
     near_clip = 1.0f;                                         // the min depth processed 1.0f
-    far_clip = 80.0f;                                         // the max depth processed 50.0f
+    far_clip = 50.0f;                                                                                                                                                                                                                                                                                                                                                                                                                       // the max depth processed 50.0f
 
     max_sqrt_vertices = 5000;
     depth_padding = 0.0f;                                    // depth padding width 80.0f
-    depth_diff_thresh = 5.0f;                               // threshold of 7-support pixels 0.15f
+    depth_diff_thresh =0.12f; //5.0f;                               // threshold of 7-support pixels 0.15f
 
     //r0 = 1.0;
     //r = 10.0f;

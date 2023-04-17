@@ -37,7 +37,7 @@
 output/*
 Pangolin/cmake-build-debug
 Pangolin/build
-SPADE/*
+SPADE/**
 cmake-build-debug/*
 
 **/novel_left
@@ -48,3 +48,7 @@ cmake-build-debug/*
 **build**
 
 *.so
+
+# editor
+.vscode
+.idea
