@@ -23,11 +23,10 @@ def move_dataset(dataset_path, param1, param2):
             -0.1_0.8.png
     """
 
-    # image_dataset = "./load_map_output/"
-    image_dataset = "../build/load_map_output/"
+    image_dataset = "./load_map_output/"
     # select_index = "0000000080.png"
     # select_index = "0000000033.png"
-    select_index = [10, 20, 30, 40, 50, 60, 70, 80, 90]  # two numbers
+    select_index = [10, 20, 30, 40, 50, 60, 70, 80, 90, 99]  # two numbers
     select_images = ["00000000%2s.png" % i for i in select_index]
     novel2gt = {"paired": "image_2_filtered", "novel_left": "image_val_0_filtered", "novel_right": "image_val_1_filtered"}
 
@@ -40,7 +39,7 @@ def move_dataset(dataset_path, param1, param2):
         lpips_value_list = []
         ssim_value_list = []
         for _select_image in select_images:
-            gt_image_path = dataset_path + novel2gt[_sub_dic_name] + "/" + _select_image
+            gt_image_path = dataset_path + "/" + novel2gt[_sub_dic_name] + "/" + _select_image
             original_image_path = image_dataset + _sub_dic_name + "/" + _select_image
             # gt: carla scene1
             # gt2: kitti01
@@ -84,6 +83,8 @@ def move_dataset(dataset_path, param1, param2):
 
         print("[%11s]\tpsnr=%.5f ssim=%.5f lpips=%.5f" % (_sub_dic_name, avg_psnr, avg_ssim, avg_lpips))
         # print("%.5f\t%.5f\t%.5f" % (psnr, ssim, lpips))
+
+    return _sub_dic_name, avg_psnr, avg_ssim, avg_lpips
 
 
 if __name__ == '__main__':

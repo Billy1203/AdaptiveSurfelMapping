@@ -31,6 +31,9 @@ bool S_shaped_novel = false;
 // overview
 int overviewId = 0;
 
+bool autoGenerateImage = true;
+
+
 void rungui(SurfelMapping & core, GUI & gui)
 {
     if(gui.getMode() == GUI::ShowMode::minimum)
@@ -82,7 +85,7 @@ void rungui(SurfelMapping & core, GUI & gui)
             //====== Enter Path Mode until Complete
             bool initView = true;
             int totalNovelViewNum = 0;
-            if(gui.pathMode->Get())
+            if(gui.pathMode->Get() || autoGenerateImage)
             {
 
                 //=== draw all history frame
@@ -321,6 +324,48 @@ void rungui(SurfelMapping & core, GUI & gui)
                     usleep(10000);
                 }
 
+                if (autoGenerateImage) {
+                    // Acquire Images
+                    std::string data_path = "./load_map_output/paired";  // todo
+
+                    std::vector<Eigen::Matrix4f> views;
+                    gui.getViews(views, modelPoses);  // todo
+
+                    core.acquireImages(data_path, views,
+                                       Config::W(), Config::H(),
+                                       Config::fx(), Config::fy(),
+                                       Config::cx(), Config::cy(),
+                                       lastRestartId);
+
+                    printf("|==== Paired images from frame %d to %d are saved. ====|\n", lastRestartId, globalId);
+                    usleep(10000);
+
+                    // save novel left image
+                    std::string data_left_path = "./load_map_output/novel_left";  // todo
+                    core.acquireImages(data_left_path, novelViewLeft,
+                                       Config::W(), Config::H(),
+                                       Config::fx(), Config::fy(),
+                                       Config::cx(), Config::cy(),
+                                       0); // totalNovelViewNum
+                    printf("|==== Novel left images from frame %d to %d are saved. ====|\n", 0,
+                           novelViewLeft.size() - 1);
+                    //totalNovelViewNum += novelViews.size();
+
+
+                    // save novel right image
+                    std::string data_right_path = "./load_map_output/novel_right";  // todo
+                    core.acquireImages(data_right_path, novelViewRight,
+                                       Config::W(), Config::H(),
+                                       Config::fx(), Config::fy(),
+                                       Config::cx(), Config::cy(),
+                                       0);
+                    printf("|==== Novel right images from frame %d to %d are saved. ====|\n", 0,
+                           +novelViewRight.size() - 1);
+
+                    usleep(10000);
+
+                    return;
+                }
 
             }
 

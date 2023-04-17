@@ -21,6 +21,9 @@ using namespace std;
 
 int globalId = 0;
 int lastRestartId = 0;
+bool autoRun = true;
+bool pushButton = false;
+int maximumFrame = 110;
 
 
 void rungui(SurfelMapping & core, GUI & gui, string model_path)
@@ -253,6 +256,11 @@ void rungui(SurfelMapping & core, GUI & gui, string model_path)
                 core.getGlobalModel().downloadMap(model_path, lastRestartId, globalId);
             }
 
+            if (pushButton) {
+                core.getGlobalModel().downloadMap(model_path, lastRestartId, globalId);
+                return;
+            }
+
             //====== Reset
             if(pangolin::Pushed(*gui.reset))
             {
@@ -311,8 +319,14 @@ int building_map(string kittiDir, string model_path, float diff, float r, string
 
         core.processFrame(reader.rgb, reader.depth, reader.semantic, &reader.gtPose);
 
+        if (autoRun && globalId >= maximumFrame) {
+            pushButton = true;
+        }
+
         // show what you want
         rungui(core, gui, model_path);
+
+        if (pushButton) return 0;
 
         if(core.getBeginCleanPoints())
         {
@@ -339,13 +353,13 @@ int building_map(string kittiDir, string model_path, float diff, float r, string
         usleep(10000);
 
     }
-//    core.getGlobalModel().downloadMap(model_path, lastRestartId, globalId);
+    //core.getGlobalModel().downloadMap(model_path, lastRestartId, globalId);
 
      //show after loop
-    //while(true)
-    //{
-    //    rungui(core, gui, model_path);
-    //}
+//    while(true)
+//    {
+//        rungui(core, gui, model_path);
+//    }
 
 
 }
