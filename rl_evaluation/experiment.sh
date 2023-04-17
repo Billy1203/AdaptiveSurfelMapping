@@ -1,3 +1,5 @@
+#!/usr/bin/zsh
+
 python_executable="/opt/miniconda3/envs/surfel/bin/python3"
 build_map_executable="build/build_map"
 dataset_path="/DATA/carla_scene3_forest"

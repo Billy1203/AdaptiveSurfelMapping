@@ -435,6 +435,8 @@ int main(int argc, char ** argv)
     modelPoses.clear();
     while (reader.getNext(file_name_width))
     {
+        cout << reader.currentFrameId << "<-" << '\n';
+
         if(reader.currentFrameId > globalId)
             break;
 
@@ -451,12 +453,12 @@ int main(int argc, char ** argv)
 
     rungui(core, gui);
     // show after loop
-    while (true)
-    {
-        rungui(core, gui);
-        if(!core.getBeginCleanPoints())
-            break;
-    }
+//    while (true)
+//    {
+//        rungui(core, gui);
+//        if(!core.getBeginCleanPoints())
+//            break;
+//    }
 
 }
 

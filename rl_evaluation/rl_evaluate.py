@@ -23,10 +23,7 @@ def move_dataset(dataset_path, param1, param2):
             -0.1_0.8.png
     """
 
-    # image_dataset = "./load_map_output/"
     image_dataset = "../build/load_map_output/"
-    # select_index = "0000000080.png"
-    # select_index = "0000000033.png"
     select_index = [10, 20, 30, 40, 50, 60, 70, 80, 90]  # two numbers
     select_images = ["00000000%2s.png" % i for i in select_index]
     novel2gt = {"paired": "image_2_filtered", "novel_left": "image_val_0_filtered", "novel_right": "image_val_1_filtered"}

@@ -20,7 +20,8 @@ def evaluate_images(kitti_gt_path, paired_path):
     image_dataset = "./load_map_output/"
     # select_index = "0000000080.png"
     # select_index = "0000000033.png"
-    select_index = [140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280]  # two numbers
+    # select_index = [140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280]  # two numbers
+    select_index = [100, 110, 120, 130, 140, 150, 160, 170, 180]  # two numbers
     select_images = ["0000000%3s.png" % i for i in select_index]
 
 
