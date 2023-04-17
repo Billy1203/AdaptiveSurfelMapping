@@ -5,6 +5,15 @@ import cv2
 import torch
 import numpy as np
 
+import warnings
+warnings.filterwarnings("ignore")
+'''
+/opt/miniconda3/envs/surfel/lib/python3.8/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/opt/miniconda3/envs/surfel/lib/python3.8/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=AlexNet_Weights.IMAGENET1K_V1`. You can also use `weights=AlexNet_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+'''
+
 from skimage.metrics import peak_signal_noise_ratio as compare_psnr
 from skimage.metrics import structural_similarity as compare_ssim
 
@@ -39,8 +48,8 @@ def move_dataset(dataset_path, param1, param2):
         lpips_value_list = []
         ssim_value_list = []
         for _select_image in select_images:
-            gt_image_path = dataset_path + "/" + novel2gt[_sub_dic_name] + "/" + _select_image
-            original_image_path = image_dataset + _sub_dic_name + "/" + _select_image
+            gt_image_path = os.path.join(dataset_path, novel2gt[_sub_dic_name], _select_image)
+            original_image_path = os.path.join(image_dataset, _sub_dic_name, _select_image)
             # gt: carla scene1
             # gt2: kitti01
             # gt3: kitti02
@@ -50,11 +59,11 @@ def move_dataset(dataset_path, param1, param2):
             if _sub_dic_name not in os.listdir("./"):
                 os.mkdir(_sub_dic_name)
 
-            new_image_name = str(param1) + "_" + str(param2) + "_" + _select_image[-6:-4] + ".png"
+            new_image_name = f"{param1}_{param2}_{_select_image[-6:-4]}.png"
 
             ###################### Image movement ######################
             # original_image_path = image_dataset + _sub_dic_name + "/" + select_index
-            new_image_path = "./" + _sub_dic_name + "/" + new_image_name
+            new_image_path = os.path.join("./", _sub_dic_name, new_image_name)
             shutil.copy(original_image_path, new_image_path)
             # print(gt_image_path, original_image_path, new_image_path)
 

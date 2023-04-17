@@ -4,11 +4,11 @@ import subprocess
 
 from rl_evaluation.src.move_data import move_dataset
 
-dataset_path = "/DATA/carla_scene3_forest"
+dataset_path = "/DATA/carla_scene3_forest/"
 model_path = "./tmp_carla03.bin"
 # param1 = None  # d, 0.05-0.45
 # param2 = None  # r, 0-5.0
-depth_dir = "/depth_2"
+depth_dir = "depth_2"
 file_name_width = "10"
 
 psnr_history = []

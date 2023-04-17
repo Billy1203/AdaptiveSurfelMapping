@@ -23,7 +23,7 @@ int globalId = 0;
 int lastRestartId = 0;
 bool autoRun = true;
 bool pushButton = false;
-int maximumFrame = 110;
+int maximumFrame = 100;
 
 
 void rungui(SurfelMapping & core, GUI & gui, string model_path)
