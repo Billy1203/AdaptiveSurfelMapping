@@ -280,50 +280,50 @@ void SurfelMapping::filterDepth()
                                                &uniforms);
 
     // ############################################ smooth depth
-//    float sigma_pixel = 4.5;
-//    float sigma_intensity = 30.;
-//    float sigma_pixel2_inv_half = 0.5f / (sigma_pixel * sigma_pixel);                 // 1 / 2*sigma^2
-//    float sigma_intensity2_inv_half = 0.5f / (sigma_intensity * sigma_intensity);
-//
-//    inputs.clear();
-//    uniforms.clear();
-//
-//    inputs.push_back(textures[GPUTexture::DEPTH_FILTERED]->texture);
-//    inputs.push_back(textures[GPUTexture::SEMANTIC]->texture);
-//
-//    uniforms.emplace_back("dSampler", 0);
-//    uniforms.emplace_back("sSampler", 1);
-//    uniforms.emplace_back("cols", (float)Config::W() );
-//    uniforms.emplace_back("rows", (float)Config::H() );
-//    uniforms.emplace_back("minD", nearClipDepth);
-//    uniforms.emplace_back("maxD", farClipDepth);
-//    uniforms.emplace_back("stereoBorder", depthPad);
-//    uniforms.emplace_back("sigPix", sigma_intensity2_inv_half);
-//    uniforms.emplace_back("r0", (float)Config::rzero());
-//
-//    computePacks[ComputePack::SMOOTH]->compute(textures[GPUTexture::DEPTH_METRIC]->texture,
-//                                               inputs,
-//                                               &uniforms);
+    float sigma_pixel = 4.5;
+    float sigma_intensity = 30.;
+    float sigma_pixel2_inv_half = 0.5f / (sigma_pixel * sigma_pixel);                 // 1 / 2*sigma^2
+    float sigma_intensity2_inv_half = 0.5f / (sigma_intensity * sigma_intensity);
 
-//    // ################################ filter unwanted classes and bad edges
-//    uniforms.clear();
-//    inputs.clear();
-//
-//    inputs.push_back(textures[GPUTexture::DEPTH_METRIC]->texture);
-//    inputs.push_back(textures[GPUTexture::SEMANTIC]->texture);
-//
-//    uniforms.emplace_back("dSampler", 0);
-//    uniforms.emplace_back("sSampler", 1);
-//    uniforms.emplace_back("cols", (float)Config::W() );
-//    uniforms.emplace_back("rows", (float)Config::H() );
-//    uniforms.emplace_back("minD", nearClipDepth);
-//    uniforms.emplace_back("maxD", farClipDepth);
-//    uniforms.emplace_back("diffThresh", (float)Config::depthDiffThresh());  // threshold of support pixel  todo tune
-//    uniforms.emplace_back("r0", (float)Config::rzero());
-//
-//    computePacks[ComputePack::FILTER]->compute(textures[GPUTexture::DEPTH_FILTERED]->texture,
-//                                               inputs,
-//                                               &uniforms);
+    inputs.clear();
+    uniforms.clear();
+
+    inputs.push_back(textures[GPUTexture::DEPTH_FILTERED]->texture);
+    inputs.push_back(textures[GPUTexture::SEMANTIC]->texture);
+
+    uniforms.emplace_back("dSampler", 0);
+    uniforms.emplace_back("sSampler", 1);
+    uniforms.emplace_back("cols", (float)Config::W() );
+    uniforms.emplace_back("rows", (float)Config::H() );
+    uniforms.emplace_back("minD", nearClipDepth);
+    uniforms.emplace_back("maxD", farClipDepth);
+    uniforms.emplace_back("stereoBorder", depthPad);
+    uniforms.emplace_back("sigPix", sigma_intensity2_inv_half);
+    uniforms.emplace_back("r0", (float)Config::rzero());
+
+    computePacks[ComputePack::SMOOTH]->compute(textures[GPUTexture::DEPTH_METRIC]->texture,
+                                               inputs,
+                                               &uniforms);
+
+    // ################################ filter unwanted classes and bad edges
+    uniforms.clear();
+    inputs.clear();
+
+    inputs.push_back(textures[GPUTexture::DEPTH_METRIC]->texture);
+    inputs.push_back(textures[GPUTexture::SEMANTIC]->texture);
+
+    uniforms.emplace_back("dSampler", 0);
+    uniforms.emplace_back("sSampler", 1);
+    uniforms.emplace_back("cols", (float)Config::W() );
+    uniforms.emplace_back("rows", (float)Config::H() );
+    uniforms.emplace_back("minD", nearClipDepth);
+    uniforms.emplace_back("maxD", farClipDepth);
+    uniforms.emplace_back("diffThresh", (float)Config::depthDiffThresh());  // threshold of support pixel  todo tune
+    uniforms.emplace_back("r0", (float)Config::rzero());
+
+    computePacks[ComputePack::FILTER]->compute(textures[GPUTexture::DEPTH_FILTERED]->texture,
+                                               inputs,
+                                               &uniforms);
 
 }
 

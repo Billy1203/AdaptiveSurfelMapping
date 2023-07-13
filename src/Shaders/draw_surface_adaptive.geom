@@ -128,22 +128,22 @@ void main()
             y = cross(vNormRad[0].xyz, x);
         }
 
-//        if(posLocal.z > 5)
-//        {
-//            vec3 tmpNorm = mat3(vMVINV[0]) * vec3(0, 0, 1);
-//            x = normalize(vec3((tmpNorm.y - tmpNorm.z), -tmpNorm.x, tmpNorm.x)) * vNormRad[0].w * 1.41421356;
-//            y = cross(tmpNorm.xyz, x);
-//        }
-//        else
-//        {
-//            vec3 eyeToVert = vPosition[0].xyz - vMVINV[0][3].xyz;
-//            float cosAngle = dot(eyeToVert, vNormRad[0].xyz) / (length(eyeToVert) * length(vNormRad[0].xyz));
-//
-//            radius = vNormRad[0].w / (1.0 + 0.5 * abs(cosAngle));
-//
-//            x = normalize(vec3((vNormRad[0].y - vNormRad[0].z), -vNormRad[0].x, vNormRad[0].x)) * radius * 1.41421356;
-//            y = cross(vNormRad[0].xyz, x);
-//        }
+        if(posLocal.z > 5)
+        {
+            vec3 tmpNorm = mat3(vMVINV[0]) * vec3(0, 0, 1);
+            x = normalize(vec3((tmpNorm.y - tmpNorm.z), -tmpNorm.x, tmpNorm.x)) * vNormRad[0].w * 1.41421356;
+            y = cross(tmpNorm.xyz, x);
+        }
+        else
+        {
+            vec3 eyeToVert = vPosition[0].xyz - vMVINV[0][3].xyz;
+            float cosAngle = dot(eyeToVert, vNormRad[0].xyz) / (length(eyeToVert) * length(vNormRad[0].xyz));
+
+            radius = vNormRad[0].w / (1.0 + 0.5 * abs(cosAngle));
+
+            x = normalize(vec3((vNormRad[0].y - vNormRad[0].z), -vNormRad[0].x, vNormRad[0].x)) * radius * 1.41421356;
+            y = cross(vNormRad[0].xyz, x);
+        }
 
         texcoord = vec2(-1.0, -1.0);
         gl_Position = vMVP[0] * vec4(vPosition[0].xyz + x, 1.0);

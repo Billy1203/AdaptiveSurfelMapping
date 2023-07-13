@@ -51,13 +51,13 @@ void main()
 
 				if(texX < 0.0 || texX > 1.0 || texY < 0.0 || texY > 1.0)
 					continue;
-	            
+
 	            texel = texture(dSampler, vec2(texX, texY));
 				float depth_k = texel.r;
 
 				utexel = texture(sSampler, vec2(texX, texY));
 				uint c_k = utexel.r;
-	            
+
 	            if(abs(depth_k - depth) < diffThresh && c == c_k)
 				{
 					supportNum++;
