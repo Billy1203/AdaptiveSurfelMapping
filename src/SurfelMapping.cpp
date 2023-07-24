@@ -390,7 +390,7 @@ void SurfelMapping::acquireImages(std::string path, const std::vector<Eigen::Mat
         //std::cout << v << std::endl;
 
         std::stringstream ss;
-        ss << std::setfill('0') << std::setw(10) << startId;
+        ss << std::setfill('0') << std::setw(6) << startId;
         std::string file_name = ss.str() + ".png";
 
         globalModel.renderImage(v);
