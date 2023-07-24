@@ -10,8 +10,8 @@ GUI::GUI(int rawWidth, int rawHeight, ShowMode mode)
   renderedViewNum(0)
 {
     // whole GUI window size
-    width = 1280;
-    height = 980;
+    width = 1280 *2;
+    height = 800;
     panel = 205;
 
     //width = 400;
@@ -71,7 +71,8 @@ GUI::GUI(int rawWidth, int rawHeight, ShowMode mode)
                 .AddDisplay(pangolin::Display("rgb"))
                 .AddDisplay(pangolin::Display("depth"));
 
-        pangolin::Display("semantic").SetAspect(rawWidth / rawHeight)
+//      修改顶部语义分割展示区域
+        pangolin::Display("semantic").SetAspect(rawWidth*1000 / rawHeight)
                 .SetLock(pangolin::LockLeft, pangolin::LockTop)
                 .SetBounds(pangolin::Attach::Pix(height - multi_height / 3), 1.0, pangolin::Attach::Pix(panel), 1.0);
 
@@ -98,11 +99,11 @@ GUI::GUI(int rawWidth, int rawHeight, ShowMode mode)
         pause = new pangolin::Var<bool>("ui.Pause", false, true);
         step = new pangolin::Var<bool>("ui.Step", false, false);
 
-        //    depthCutoff = new pangolin::Var<float>("ui.Depth cutoff", 3.0, 0.0, 12.0);
+//        depthCutoff = new pangolin::Var<float>("ui.Depth cutoff", 3.0, 0.0, 12.0);
         //
-        followPose = new pangolin::Var<bool>("ui.Follow pose", true, true);
+        followPose = new pangolin::Var<bool>("ui.Follow pose", false, true);
         drawRawCloud = new pangolin::Var<int>("ui.Draw raw", 2, 0, 5);
-        //drawFilteredCloud = new pangolin::Var<int>("ui.Draw filtered", 0, 0, 4);
+//        drawFilteredCloud = new pangolin::Var<int>("ui.Draw filtered", 0, 0, 4);
         drawGlobalModel = new pangolin::Var<int>("ui.Draw global model", 4, 0, 5);
         clean = new pangolin::Var<bool>("ui.Clean Pointcloud", false, false);
         save = new pangolin::Var<bool>("ui.Save", false, false);
