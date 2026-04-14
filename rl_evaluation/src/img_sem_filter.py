@@ -1,54 +1,74 @@
-import numpy as np
+import argparse
+from pathlib import Path
+
 import cv2
-import os
+import numpy as np
 
 
-def image_filter(img, sem, target):
-    assert img.shape == sem.shape, "image and sem in different shape."
-    assert target.shape[0] == 3, "target sem should in 3 channel RGB format."
+def image_filter(img, sem, target_rgb):
+    if img is None or sem is None:
+        raise ValueError("image or semantic image is None.")
+    if img.shape != sem.shape:
+        raise ValueError("image and semantic map have different shapes.")
 
-    mask_list = []
-    for i in (sem == target):
-        for j in i:
-            if j[0] and j[1] and j[2]:  # all is true, remove the pixels
-                mask_list.append(0)
-            else:
-                mask_list.append(1)
-    mask_img = np.array(mask_list, dtype=np.uint8).reshape(img.shape[0], img.shape[1])
-    mask_img2 = cv2.cvtColor(mask_img * 255, cv2.COLOR_GRAY2BGR)
-    img2 = cv2.bitwise_and(img, mask_img2)
-    return img2
+    # Remove pixels whose semantic color exactly matches target_rgb.
+    target = np.array(target_rgb, dtype=np.uint8).reshape(1, 1, 3)
+    keep_mask = np.any(sem != target, axis=2).astype(np.uint8) * 255
+    keep_mask_bgr = cv2.cvtColor(keep_mask, cv2.COLOR_GRAY2BGR)
+    return cv2.bitwise_and(img, keep_mask_bgr)
 
-if __name__=='__main__':
-    carla_dataset_path = "/home/yiheng/dataset/carla/carla_scene2_highway/"
-    for image_dic in ["image_2", "image_3", "image_val_0", "image_val_1"]:
-        sem_dic = image_dic + "_semantic"
 
-        target_color = np.array([180, 130, 70])  # sky
+def parse_args():
+    parser = argparse.ArgumentParser(description="Filter semantic class pixels from CARLA RGB images.")
+    parser.add_argument("dataset_path", help="Formatted dataset root path")
+    parser.add_argument(
+        "--target-rgb",
+        nargs=3,
+        type=int,
+        default=[180, 130, 70],
+        help="Semantic RGB value to remove, default is sky class in CARLA",
+    )
+    return parser.parse_args()
 
-        filtered_dic = image_dic + "_filtered"
-        if not os.path.exists(carla_dataset_path+filtered_dic):
-            os.mkdir(carla_dataset_path+filtered_dic)
-            print("filtered dic built.")
-        else:
-            print("filtered dic exist.")
 
-        image_list = os.listdir(carla_dataset_path+image_dic)
+def main():
+    args = parse_args()
+    dataset_root = Path(args.dataset_path).expanduser().resolve()
+    if not dataset_root.exists():
+        raise FileNotFoundError(f"Dataset path does not exist: {dataset_root}")
 
-        for _image_name in image_list:
-            _image_path = carla_dataset_path + image_dic + '/' + _image_name
-            _sem_path = carla_dataset_path + sem_dic + '/' + _image_name
-            _filtered_path = carla_dataset_path + filtered_dic + '/' + _image_name
+    for image_dir in ["image_2", "image_3", "image_val_0", "image_val_1"]:
+        sem_dir = f"{image_dir}_semantic"
+        filtered_dir = f"{image_dir}_filtered"
 
-            img = cv2.imread(_image_path)
-            sem = cv2.imread(_sem_path)
+        image_root = dataset_root / image_dir
+        sem_root = dataset_root / sem_dir
+        out_root = dataset_root / filtered_dir
+        out_root.mkdir(parents=True, exist_ok=True)
 
-            filtered_img = image_filter(img, sem, target_color)
+        if not image_root.exists() or not sem_root.exists():
+            print(f"[WARN] skip {image_dir}: missing {image_root} or {sem_root}")
+            continue
 
-            cv2.imwrite(_filtered_path, filtered_img)
+        image_names = sorted([p.name for p in image_root.iterdir() if p.suffix.lower() == ".png"])
+        for image_name in image_names:
+            image_path = image_root / image_name
+            sem_path = sem_root / image_name
+            out_path = out_root / image_name
+            if not sem_path.exists():
+                print(f"[WARN] missing semantic file: {sem_path}")
+                continue
 
-        print("%s finished." % image_dic)
+            img = cv2.imread(str(image_path))
+            sem = cv2.imread(str(sem_path))
+            filtered_img = image_filter(img, sem, args.target_rgb)
+            cv2.imwrite(str(out_path), filtered_img)
 
+        print(f"{image_dir} finished.")
+
+
+if __name__ == "__main__":
+    main()
 
 
 

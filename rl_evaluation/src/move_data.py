@@ -1,93 +1,124 @@
-import os
+import argparse
 import shutil
 import sys
-import cv2
-import torch
-import numpy as np
+from pathlib import Path
 
+import cv2
+import numpy as np
+import torch
 from skimage.metrics import peak_signal_noise_ratio as compare_psnr
 from skimage.metrics import structural_similarity as compare_ssim
 
-# LPIPS environment
-sys.path.append("./PerceptualSimilarity-1.0/")
-import models
-from util import util
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+LPIPS_DIR = PROJECT_DIR / "PerceptualSimilarity-1.0"
+sys.path.insert(0, str(LPIPS_DIR))
+
+import models  # noqa: E402
+from util import util  # noqa: E402
+
+NOVEL_TO_GT = {
+    "paired": "image_2_filtered",
+    "novel_left": "image_val_0_filtered",
+    "novel_right": "image_val_1_filtered",
+}
 
 
-def move_dataset(dataset_path, param1, param2):
-    """
-        move data from 'aaa' to specific dataset
-
-        - paired
-            -0.1_0.5.png
-            -0.1_0.8.png
-    """
-
-    image_dataset = "./load_map_output/"
-    # select_index = "0000000080.png"
-    # select_index = "0000000033.png"
-    select_index = [10, 20, 30, 40, 50, 60, 70, 80, 90]  # two numbers
-    select_images = ["00000000%2s.png" % i for i in select_index]
-    novel2gt = {"paired": "image_2_filtered", "novel_left": "image_val_0_filtered", "novel_right": "image_val_1_filtered"}
-
-    lpips_model = models.PerceptualLoss(use_gpu=False)
-    print(">" * 16, "param1=%.2f param2=%.2f" % (param1, param2), "<" * 16)
-
-    for _sub_dic_name in ["paired", "novel_left", "novel_right"]:
-        # for _sub_dic_name in ["paired"]:
-        psnr_value_list = []
-        lpips_value_list = []
-        ssim_value_list = []
-        for _select_image in select_images:
-            gt_image_path = dataset_path + novel2gt[_sub_dic_name] + "/" + _select_image
-            original_image_path = image_dataset + _sub_dic_name + "/" + _select_image
-            # gt: carla scene1
-            # gt2: kitti01
-            # gt3: kitti02
-            # gt4: kitti06
-
-            # if not exist
-            if _sub_dic_name not in os.listdir("./"):
-                os.mkdir(_sub_dic_name)
-
-            new_image_name = str(param1) + "_" + str(param2) + "_" + _select_image[-6:-4] + ".png"
-
-            ###################### Image movement ######################
-            # original_image_path = image_dataset + _sub_dic_name + "/" + select_index
-            new_image_path = "./" + _sub_dic_name + "/" + new_image_name
-            shutil.copy(original_image_path, new_image_path)
-            # print(gt_image_path, original_image_path, new_image_path)
-
-            ###################### Image evaluation ######################
-            original_img = cv2.imread(original_image_path)
-            gt_img = cv2.imread(gt_image_path)
-            # print(original_image_path, gt_image_path)
-            # print(original_image_path, gt_image_path)
-
-            psnr = compare_psnr(gt_img, original_img)
-            ssim = compare_ssim(gt_img, original_img, channel_axis=2, data_range=255)
-
-            gt_tensor = util.im2tensor(gt_img)
-            original_tensor = util.im2tensor(original_img)
-            lpips = torch.square(lpips_model.forward(gt_tensor, original_tensor))
-            lpips_tmp = lpips.detach().numpy()[0][0][0][0]
-            # print(lpips.detach().numpy()[0][0][0][0])
-
-            psnr_value_list.append(psnr)
-            ssim_value_list.append(ssim)
-            lpips_value_list.append(lpips_tmp)
-        # print(psnr_value_list)
-        avg_psnr = np.array(psnr_value_list).mean()
-        avg_ssim = np.array(ssim_value_list).mean()
-        avg_lpips = np.array(lpips_value_list).mean()
-
-        print("[%11s]\tpsnr=%.5f ssim=%.5f lpips=%.5f" % (_sub_dic_name, avg_psnr, avg_ssim, avg_lpips))
-        # print("%.5f\t%.5f\t%.5f" % (psnr, ssim, lpips))
+def parse_args():
+    parser = argparse.ArgumentParser(description="Copy render outputs and evaluate PSNR/SSIM/LPIPS.")
+    parser.add_argument("dataset_path", help="Formatted dataset root path")
+    parser.add_argument("param1", type=float, help="diff_thresh")
+    parser.add_argument("param2", type=float, help="r0")
+    parser.add_argument(
+        "--frames",
+        type=int,
+        nargs="+",
+        default=[10, 20, 30, 40, 50, 60, 70, 80, 90],
+        help="Frame indices to evaluate (default: 10..90 step 10)",
+    )
+    return parser.parse_args()
 
 
-if __name__ == '__main__':
-    dataset_path = sys.argv[1]
-    param1 = float(sys.argv[2])
-    param2 = float(sys.argv[3])
+def _frame_name(frame_idx):
+    return f"{frame_idx:010d}.png"
 
-    move_dataset(dataset_path, param1, param2)
+
+def _load_lpips_model():
+    return models.PerceptualLoss(use_gpu=False)
+
+
+def _compute_metrics(gt_image, pred_image, lpips_model):
+    psnr = compare_psnr(gt_image, pred_image)
+    ssim = compare_ssim(gt_image, pred_image, channel_axis=2, data_range=255)
+    gt_tensor = util.im2tensor(gt_image)
+    pred_tensor = util.im2tensor(pred_image)
+    lpips = torch.square(lpips_model.forward(gt_tensor, pred_tensor))
+    lpips_value = float(lpips.detach().numpy()[0][0][0][0])
+    return psnr, ssim, lpips_value
+
+
+def move_dataset(dataset_path, param1, param2, frames):
+    dataset_root = Path(dataset_path).expanduser().resolve()
+    if not dataset_root.exists():
+        raise FileNotFoundError(f"Dataset path does not exist: {dataset_root}")
+
+    image_dataset = PROJECT_DIR / "load_map_output"
+    lpips_model = _load_lpips_model()
+
+    print(">" * 16, f"param1={param1:.2f} param2={param2:.2f}", "<" * 16)
+
+    for split_name in ("paired", "novel_left", "novel_right"):
+        source_dir = image_dataset / split_name
+        gt_dir = dataset_root / NOVEL_TO_GT[split_name]
+        export_dir = PROJECT_DIR / split_name
+        export_dir.mkdir(parents=True, exist_ok=True)
+
+        if not source_dir.exists():
+            raise FileNotFoundError(f"Missing render output directory: {source_dir}")
+        if not gt_dir.exists():
+            raise FileNotFoundError(
+                f"Missing GT directory '{gt_dir}'. "
+                f"Generate filtered images first (see docs/DATA_LAYOUT.md)."
+            )
+
+        psnr_values = []
+        ssim_values = []
+        lpips_values = []
+
+        for frame_idx in frames:
+            frame_name = _frame_name(frame_idx)
+            pred_path = source_dir / frame_name
+            gt_path = gt_dir / frame_name
+
+            if not pred_path.exists() or not gt_path.exists():
+                print(f"[WARN] skip frame {frame_name}: missing pred/gt file")
+                continue
+
+            new_name = f"{param1}_{param2}_{frame_name[-6:-4]}.png"
+            shutil.copy2(pred_path, export_dir / new_name)
+
+            pred_img = cv2.imread(str(pred_path))
+            gt_img = cv2.imread(str(gt_path))
+            if pred_img is None or gt_img is None:
+                print(f"[WARN] skip frame {frame_name}: failed to decode image")
+                continue
+
+            psnr, ssim, lpips = _compute_metrics(gt_img, pred_img, lpips_model)
+            psnr_values.append(psnr)
+            ssim_values.append(ssim)
+            lpips_values.append(lpips)
+
+        if not psnr_values:
+            print(f"[{split_name:>11s}]\tNo valid frames were evaluated.")
+            continue
+
+        print(
+            f"[{split_name:>11s}]\t"
+            f"psnr={np.mean(psnr_values):.5f} "
+            f"ssim={np.mean(ssim_values):.5f} "
+            f"lpips={np.mean(lpips_values):.5f}"
+        )
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    move_dataset(args.dataset_path, args.param1, args.param2, args.frames)

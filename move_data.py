@@ -1,32 +1,44 @@
-# move generated data, especially novel data, to destinate dir without conflict
+"""Move generated novel outputs into dataset folders with index offset."""
 
-import os
 import argparse
+import shutil
+from pathlib import Path
 
-novel_path = './output/novel'
-data_dir_list = ['image', 'semantic']
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--offset', type=int, help='frame number offset (add)')
-parser.add_argument('-t', '--destination', type=str, help='destination directory')
-parser.add_argument('-f', '--fake', action='store_true', help='if set, only print operations but not really implement')
+def parse_args():
+    parser = argparse.ArgumentParser(description="Move generated novel image/semantic files with index offset.")
+    parser.add_argument("--offset", type=int, required=True, help="Frame number offset to add")
+    parser.add_argument("-t", "--destination", type=str, required=True, help="Destination dataset directory")
+    parser.add_argument("-f", "--fake", action="store_true", help="Only print operations")
+    parser.add_argument("--source", type=str, default="./output/novel", help="Source novel output directory")
+    return parser.parse_args()
 
-args = parser.parse_args()
-offset = args.offset
-dest_dir = args.destination
 
-for data_dir in data_dir_list:
-    full_data_dir = os.path.join(novel_path, data_dir)
-    data_list = os.listdir(full_data_dir)
-    full_dest_data_dir = os.path.join(dest_dir, data_dir)
+def main():
+    args = parse_args()
+    source_root = Path(args.source).expanduser().resolve()
+    dest_root = Path(args.destination).expanduser().resolve()
 
-    # print(data_list)
+    for data_dir in ("image", "semantic"):
+        src_dir = source_root / data_dir
+        dst_dir = dest_root / data_dir
 
-    for data in data_list:
-        base_id = int(data.split('.')[0])
-        dest_data = '{:0>6d}.png'.format(base_id + offset)
+        if not src_dir.exists():
+            print(f"[WARN] source directory not found: {src_dir}")
+            continue
 
-        print('mv {} {}'.format(os.path.join(full_data_dir, data), os.path.join(full_dest_data_dir, dest_data)))
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        src_files = sorted([p for p in src_dir.iterdir() if p.is_file() and p.suffix.lower() == ".png"])
 
-        if not args.fake:
-            os.system('mv {} {}'.format(os.path.join(full_data_dir, data), os.path.join(full_dest_data_dir, dest_data)))
+        for src_file in src_files:
+            base_id = int(src_file.stem)
+            dest_name = f"{base_id + args.offset:06d}.png"
+            dst_file = dst_dir / dest_name
+
+            print(f"mv {src_file} {dst_file}")
+            if not args.fake:
+                shutil.move(str(src_file), str(dst_file))
+
+
+if __name__ == "__main__":
+    main()

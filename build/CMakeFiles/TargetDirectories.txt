@@ -1,8 +1,0 @@
-/home/yiheng/AdaptiveSurfelMapping/build/CMakeFiles/rebuild_cache.dir
-/home/yiheng/AdaptiveSurfelMapping/build/CMakeFiles/load_map.dir
-/home/yiheng/AdaptiveSurfelMapping/build/CMakeFiles/edit_cache.dir
-/home/yiheng/AdaptiveSurfelMapping/build/CMakeFiles/build_map.dir
-/home/yiheng/AdaptiveSurfelMapping/build/CMakeFiles/surmap_gui.dir
-/home/yiheng/AdaptiveSurfelMapping/build/CMakeFiles/surfelmapping.dir
-/home/yiheng/AdaptiveSurfelMapping/build/pybind11/CMakeFiles/rebuild_cache.dir
-/home/yiheng/AdaptiveSurfelMapping/build/pybind11/CMakeFiles/edit_cache.dir

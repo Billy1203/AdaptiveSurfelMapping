@@ -1,2 +1,0 @@
-/home/zhijun/Libraries/Pangolin/examples/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/zhijun/Libraries/Pangolin/examples/cmake-build-debug/CMakeFiles/edit_cache.dir

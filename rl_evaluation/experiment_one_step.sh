@@ -1,5 +1,26 @@
-#/home/yiheng/dataset/carla/carla_scene3_forest/ 0.2 3.1 depth_2 10
+#!/usr/bin/env bash
+set -euo pipefail
 
-python src/build_map.py $1 ./tmp_carla01.bin $2 $3 $4 $5
-python src/load_map.py $1 ./tmp_carla01.bin $2 $3 $4 $5
-python src/move_data.py $1 $2 $3
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [ "$#" -lt 5 ] || [ "$#" -gt 6 ]; then
+  echo "Usage: $0 <dataset_path> <param1> <param2> <depth_dir> <file_name_width> [model_path]"
+  echo "Example: $0 /data/carla_scene1 1.5 2.0 depth_2 10 ./tmp_model.bin"
+  exit 1
+fi
+
+dataset_path="$1"
+param1="$2"
+param2="$3"
+depth_dir="$4"
+file_name_width="$5"
+model_path="${6:-./tmp_model.bin}"
+
+if [ ! -d "$dataset_path" ]; then
+  echo "Error: dataset path does not exist: $dataset_path"
+  exit 1
+fi
+
+python3 "$SCRIPT_DIR/src/build_map.py" "$dataset_path" "$model_path" "$param1" "$param2" "$depth_dir" "$file_name_width"
+python3 "$SCRIPT_DIR/src/load_map.py" "$dataset_path" "$model_path" "$param1" "$param2" "$depth_dir" "$file_name_width"
+python3 "$SCRIPT_DIR/src/move_data.py" "$dataset_path" "$param1" "$param2"

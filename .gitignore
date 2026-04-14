@@ -12,7 +12,7 @@
 *.pch
 
 # Compiled Dynamic libraries
-#*.so
+*.so
 *.dylib
 *.dll
 
@@ -37,12 +37,26 @@
 output/*
 Pangolin/cmake-build-debug
 Pangolin/build
+Pangolin/examples/cmake-build-debug
 SPADE/*
 cmake-build-debug/*
+build/
 
 rl_evaluation/load_map_output/*
 rl_evaluation/novel_left/*
 rl_evaluation/novel_right/*
 rl_evaluation/paired/*
+rl_evaluation/src/*.so
+
+.idea/
+rl_evaluation/.idea/
+
+__pycache__/
+*.pyc
+
+.ipynb_checkpoints/
+rl_evaluation/.ipynb_checkpoints/
+rl_evaluation/src/.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
 
 .DS_Store

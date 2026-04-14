@@ -1,72 +1,86 @@
-import os
-import shutil
+import argparse
 import sys
-import cv2
-import torch
-import numpy as np
+from pathlib import Path
 
+import cv2
+import numpy as np
+import torch
 from skimage.metrics import peak_signal_noise_ratio as compare_psnr
 from skimage.metrics import structural_similarity as compare_ssim
 
-# LPIPS environment
-sys.path.append("./PerceptualSimilarity-1.0/")
-import models
-from util import util
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+LPIPS_DIR = PROJECT_DIR / "PerceptualSimilarity-1.0"
+sys.path.insert(0, str(LPIPS_DIR))
+
+import models  # noqa: E402
+from util import util  # noqa: E402
 
 
-def evaluate_images(kitti_gt_path, paired_path):
+def parse_args():
+    parser = argparse.ArgumentParser(description="Evaluate paired images against GT using PSNR/SSIM/LPIPS.")
+    parser.add_argument("kitti_gt_path", help="Ground-truth image directory")
+    parser.add_argument("paired_path", help="Predicted image directory")
+    parser.add_argument(
+        "--frames",
+        type=int,
+        nargs="+",
+        default=[140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280],
+        help="Frame indices to evaluate",
+    )
+    return parser.parse_args()
 
 
-    image_dataset = "./load_map_output/"
-    # select_index = "0000000080.png"
-    # select_index = "0000000033.png"
-    select_index = [140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280]  # two numbers
-    select_images = ["0000000%3s.png" % i for i in select_index]
+def _frame_name(frame_idx):
+    return f"{frame_idx:010d}.png"
 
 
+def evaluate_images(kitti_gt_path, paired_path, frames):
+    gt_root = Path(kitti_gt_path).expanduser().resolve()
+    pred_root = Path(paired_path).expanduser().resolve()
+    if not gt_root.exists():
+        raise FileNotFoundError(f"GT path does not exist: {gt_root}")
+    if not pred_root.exists():
+        raise FileNotFoundError(f"Prediction path does not exist: {pred_root}")
 
     lpips_model = models.PerceptualLoss(use_gpu=False)
+    psnr_values = []
+    ssim_values = []
+    lpips_values = []
 
-    # for _sub_dic_name in ["paired"]:
-    psnr_value_list = []
-    lpips_value_list = []
-    ssim_value_list = []
-    for _select_image in select_images:
-        gt_image_path = kitti_gt_path + "/" + _select_image[-10:]
-        original_image_path = paired_path + "/" + _select_image
-        ###################### Image evaluation ######################
-        original_img = cv2.imread(original_image_path)
-        gt_img = cv2.imread(gt_image_path)
-        # print(original_image_path, gt_image_path)
+    for frame_idx in frames:
+        frame_name = _frame_name(frame_idx)
+        gt_image_path = gt_root / frame_name
+        pred_image_path = pred_root / frame_name
 
-        psnr = compare_psnr(gt_img, original_img)
-        ssim = compare_ssim(gt_img, original_img, channel_axis=2, data_range=255)
+        if not gt_image_path.exists() or not pred_image_path.exists():
+            print(f"[WARN] skip frame {frame_name}: missing pred/gt file")
+            continue
+
+        pred_img = cv2.imread(str(pred_image_path))
+        gt_img = cv2.imread(str(gt_image_path))
+        if pred_img is None or gt_img is None:
+            print(f"[WARN] skip frame {frame_name}: failed to decode image")
+            continue
+
+        psnr = compare_psnr(gt_img, pred_img)
+        ssim = compare_ssim(gt_img, pred_img, channel_axis=2, data_range=255)
 
         gt_tensor = util.im2tensor(gt_img)
-        original_tensor = util.im2tensor(original_img)
-        lpips = torch.square(lpips_model.forward(gt_tensor, original_tensor))
-        lpips_tmp = lpips.detach().numpy()[0][0][0][0]
-        # print(lpips.detach().numpy()[0][0][0][0])
+        pred_tensor = util.im2tensor(pred_img)
+        lpips = torch.square(lpips_model.forward(gt_tensor, pred_tensor))
+        lpips_value = float(lpips.detach().numpy()[0][0][0][0])
 
-        psnr_value_list.append(psnr)
-        ssim_value_list.append(ssim)
-        lpips_value_list.append(lpips_tmp)
-        # print(psnr_value_list)
-    avg_psnr = np.array(psnr_value_list).mean()
-    avg_ssim = np.array(ssim_value_list).mean()
-    avg_lpips = np.array(lpips_value_list).mean()
+        psnr_values.append(psnr)
+        ssim_values.append(ssim)
+        lpips_values.append(lpips_value)
 
-    print("psnr=%.5f ssim=%.5f lpips=%.5f" % (avg_psnr, avg_ssim, avg_lpips))
-    print(np.array(psnr_value_list).max(), np.array(ssim_value_list).max(), np.array(lpips_value_list).min())
-    print(psnr_value_list)
-    print(ssim_value_list)
-    print(lpips_value_list)
-    # print("%.5f\t%.5f\t%.5f" % (psnr, ssim, lpips))
+    if not psnr_values:
+        raise RuntimeError("No valid frame pairs were found for evaluation.")
+
+    print(f"psnr={np.mean(psnr_values):.5f} ssim={np.mean(ssim_values):.5f} lpips={np.mean(lpips_values):.5f}")
+    print(f"max_psnr={np.max(psnr_values):.5f} max_ssim={np.max(ssim_values):.5f} min_lpips={np.min(lpips_values):.5f}")
 
 
-if __name__ == '__main__':
-    kitti_gt_path = sys.argv[1]
-    paired_path = sys.argv[2]
-
-
-    evaluate_images(kitti_gt_path, paired_path)
+if __name__ == "__main__":
+    args = parse_args()
+    evaluate_images(args.kitti_gt_path, args.paired_path, args.frames)

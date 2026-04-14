@@ -1,82 +1,166 @@
 # Adaptive Surfel Mapping
 
-Real time traffic scene mapping using dense surfel representation.
+<p align="left">
+  <img src="https://img.shields.io/badge/C%2B%2B-11-blue" alt="C++11"/>
+  <img src="https://img.shields.io/badge/CMake-%3E%3D3.16-0f4c81" alt="CMake"/>
+  <img src="https://img.shields.io/badge/Python-3.10-3776ab" alt="Python"/>
+  <img src="https://img.shields.io/badge/Status-Research%20Code-8a2be2" alt="Status"/>
+</p>
 
-This repo is part of the code of Adaptive Large-Scale Novel View Image Synthesis for Autonomous Driving Datasets. The SurfelMapping rebuilds the 3D traffic scene from images collected by stereo camera of a driving vihecle. The 3D model is represented by surfels to make the rendered images more realistic.
+Official code release for the IROS 2025 paper  
+**Adaptive Large-Scale Novel View Image Synthesis for Autonomous Driving Datasets**.
 
-# 1. Dependencies
+Adaptive surfel-based mapping and novel-view rendering for autonomous driving scenes (CARLA / KITTI). The repository contains C++ mapping core, Python experiment wrappers, and evaluation scripts.
 
-1. Tested on Ubuntu 20.04 & Ubuntu 18.04
-2. CMake 3.16.3
-3. OpenGL
-4. Eigen
-5. https://github.com/stevenlovegrove/Pangolin build from source
-6. https://github.com/pybind/pybind11 optional, calling opengl methods in python
-7. https://github.com/NVlabs/SPADE optional, for pose-processing
-8. Not too small GPU memory, we tested on NVIDIA GTX 1080ti, GPU memory=12GB
+![Load map demo](assets/demo/loadmap.gif)
 
-# 2. Dataset Preparation
+## 📌 Project Scope
 
-## 2.1 carlaDatasetTools
+- Build a global surfel map from RGB-D (or pseudo-depth) sequences.
+- Render paired and novel views from generated maps.
+- Evaluate image quality with PSNR / SSIM / LPIPS for parameter search.
+- Keep reproducible experiment scripts under `rl_evaluation/`.
 
-## 2.2 psmnet depth generate
+## 🗂 Repository Layout
 
-# 3. Build
+```text
+AdaptiveSurfelMapping/
+  assets/
+    demo/                         # README demo media
+  docs/
+    DATA_LAYOUT.md                # dataset contract
+    DOWNLOADS.md                  # all external links and placement
+    FILE_AUDIT.md                 # cleanup log
+  notebooks/
+    pre_processing.ipynb
+    image_evaluation.ipynb
+    rl_evaluation_plot.ipynb
+  src/                            # surfel mapping core + shaders
+  gui/                            # dataset reader + GUI
+  rl_evaluation/
+    experiment_one_step.sh
+    experiment_batch.sh
+    src/                          # python wrappers + evaluation
+    PerceptualSimilarity-1.0/     # LPIPS vendor code
+  build_map.cpp                   # C++ map build entry
+  load_map.cpp                    # C++ map load/render entry
+  prepare_data.py                 # dataset conversion utility
+  preparation.json                # conversion config
+  move_data.py                    # generated image organizer
+  CMakeLists.txt
+  requirements.txt
+```
 
-## 3.1. Build in C++ for testing
+## ⚙️ Environment
+
+### C++ dependencies
+
+- Ubuntu 18.04/20.04 (historically tested)
+- CMake >= 3.16
+- OpenGL
+- Eigen
+- OpenCV
+- Pangolin (vendored in this repo)
+
+### Python dependencies
 
 ```bash
-git clone https://github.com/Billy1203/AdaptiveSurfelMapping.git
+python3 -m pip install -r requirements.txt
+```
 
-cd AdaptiveSurfelMapping & mkdir build & cd build
+- Python 3.10
+
+Security note:
+- `pytest` has been constrained to `>=9.0.3` for CVE-2025-71176 mitigation.
+
+## 🚀 Build and Run
+
+```bash
+mkdir -p build
+cd build
 cmake ..
-make -j12
-
-# Step1: to build the surfel map, run
-./build_map [path to the data super dir] [path for model saving] [param1] [param2]
-# In the GUI window, uncheck "pause" button and run the mapping. Click "save" for saving the built map.
-
-# Step2: to load saved map and generate new data, run
-./load_map [path to the data super dir] [saved model path] [param1] [param2]
-# Click "path mode" and generate novel views as shown and instructed in _loadmap.gif_. Then click "Acquire Novel Images" to get new images of those views.
+make -j"$(nproc)"
 ```
 
-![image](./loadmap.gif)
-
-## 3.2. Build in Python for response surface methodology
+Run `build_map`:
 
 ```bash
-# Modify CMakeList.txt, build_map.cpp and load_map.cpp
-# Generate build_map.so and load_map.so can be called in python
-
-cd rl_evaluation
-# Step1: evaluation for one pair of parameters
-./experiment_one_step.sh [param1] [param2] # recommand param1 in (0.5, 4.5), param2 in (0.1, 5.0)
-# Show the evaluation values in terminal, using them in minitab for RSM
-
-# Step2: evaluation for 2,050 pairs of parameters
-./experiment_batch.sh
-# Generate 2,050 images for each experiment in the directories, compare them later.
+./build_map <dataset_root> <model_path.bin> <diff_thresh> <r0> <depth_dir> <file_name_width>
 ```
 
-# 4. Usage
+Run `load_map`:
 
-The program requires RGB images and corresponding DEPTH and SEMANTIC maps as input. We use some third part learning methods prediction to provide dense depth map and semantic labels. You can download our demo data [here](https://drive.google.com/file/d/1uKM7Gbs_Hy99OwrfqNmNIAZQuydQ_Gdw/view?usp=sharing) (using [PSMNet](https://github.com/JiaRenChang/PSMNet) for depth and [PointRend](https://github.com/facebookresearch/detectron2/tree/main/projects/PointRend) for semantic). You can use your own data including RGB, depth and semantic. The RGB, depth and semantic subdirectories should be in a same super directory and set the subdir name in the KittiReader. See `KittiReader.cpp` for details of input path. If you use the demo data, you do not need to change it.
+```bash
+./load_map <dataset_root> <model_path.bin> <diff_thresh> <r0> <depth_dir> <file_name_width>
+```
 
-## 4.1 Ground truth depth
+## 🧪 Experiment Pipeline
 
-1. Modify in `KittiReader.cpp`, change the path of depth directory.
-2. Use
+1. Prepare dataset (format conversion and metadata export):
+   - edit `preparation.json`
+   - run `python3 prepare_data.py`
+2. Build map:
+   - `rl_evaluation/src/build_map.py` (or C++ binary directly)
+3. Load map and render paired/novel views:
+   - `rl_evaluation/src/load_map.py`
+4. Collect outputs and evaluate:
+   - `rl_evaluation/src/move_data.py`
+   - `rl_evaluation/src/evaluate_images.py`
 
-## 4.2 PSMNet depth
+Single run:
 
-1. Modify the depth directory path in `KittiReader.cpp`
-2. evaluation directly
+```bash
+cd rl_evaluation
+./experiment_one_step.sh <dataset_root> <diff_thresh> <r0> <depth_dir> <file_name_width> [model_path]
+```
 
+Batch sweep:
 
-# SPADE
-The work in _SPADE_ dir is forked from https://github.com/NVlabs/SPADE. We modified the input and some other parts. a _postprocess.py_ is also added for synthesizing final images from the GAN generated image and rendered image. Please go to original [SPADE](https://github.com/NVlabs/SPADE) to see the training and testing of the code.
+```bash
+cd rl_evaluation
+./experiment_batch.sh <dataset_root> <depth_dir> <file_name_width> [model_path]
+```
 
+## 🧭 Parameter Definition
 
-# Acknowledgements
-Our code is inspired by [ElasticFusion](https://www.imperial.ac.uk/dyson-robotics-lab/downloads/elastic-fusion/).
+- `diff_thresh`:
+  depth fusion threshold used during map construction (`build_map` stage).
+- `r0`:
+  surfel rendering scale control used during map rendering (`load_map` stage).
+- `depth_dir`:
+  depth source directory name under dataset root (e.g. `depth_2`, `psmnet`).
+- `file_name_width`:
+  zero-padding width of frame names (typically `6` or `10`).
+
+## 📁 Downloads and Data Placement
+
+All external links and recommended placement are maintained in [docs/DOWNLOADS.md](docs/DOWNLOADS.md).  
+Dataset directory contract is documented in [docs/DATA_LAYOUT.md](docs/DATA_LAYOUT.md).
+
+## ❗ Troubleshooting
+
+- `file_name_width` mismatch (e.g. `6` vs `10`) leads to immediate file-not-found errors.
+- `depth_dir` mismatch (e.g. `depth_2` vs `psmnet`) causes missing depth frames.
+- If Python wrappers cannot import `build_map` or `load_map`, rebuild the C++ modules and verify working directory / `PYTHONPATH`.
+- For CARLA evaluation, ensure filtered GT folders exist (`image_2_filtered`, `image_val_0_filtered`, `image_val_1_filtered`) before metric scripts.
+
+## 📚 Citation
+
+Paper: [IEEE Xplore](https://ieeexplore.ieee.org/abstract/document/11246703)
+
+```bibtex
+@INPROCEEDINGS{11246703,
+  author={Xue, Yiheng and Lyu, Zhijun and Ma, Rui and Xie, Yuezhen and Hao, Qi},
+  booktitle={2025 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
+  title={Adaptive Large-Scale Novel View Image Synthesis for Autonomous Driving Datasets},
+  year={2025},
+  pages={13705-13712},
+  keywords={Image quality;Geometry;Adaptation models;Solid modeling;Three-dimensional displays;Translation;Computational modeling;Source coding;Rendering (computer graphics);Tuning;mapping;RGB-D perception;data sets for robotic vision},
+  doi={10.1109/IROS60139.2025.11246703}
+}
+```
+
+## 🙏 Acknowledgement
+
+This project is inspired by ElasticFusion:
+https://www.imperial.ac.uk/dyson-robotics-lab/downloads/elastic-fusion/
